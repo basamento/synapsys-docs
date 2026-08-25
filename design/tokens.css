@@ -1,0 +1,343 @@
+/* =============================================================================
+   Synapsys — design tokens
+   -----------------------------------------------------------------------------
+   Single source of truth for the docs site. Infima (--ifm-*) drives the
+   Docusaurus chrome; shadcn/ui reads --background, --primary and friends. Both
+   are mapped onto the --syn-* layer below, so the docs body and the landing
+   page cannot drift apart.
+
+   Import once, before any other stylesheet:
+       @import "./tokens.css";
+
+   Dark mode is keyed on [data-theme='dark'], which is what Docusaurus stamps on
+   <html>. If you add Tailwind, point its darkMode at the same selector:
+       darkMode: ['class', '[data-theme="dark"]']
+   ========================================================================== */
+
+:root {
+  /* --- brand ramp ---------------------------------------------------------- */
+  --syn-brand-50:   #F2EFFF;   /* tint surfaces                                */
+  --syn-brand-200:  #D9CFFF;   /* borders, focus rings                         */
+  --syn-brand-500:  #7C5CFF;   /* dark-theme accent                            */
+  --syn-brand-600:  #5F3DF2;   /* buttons and links — the brand                */
+  --syn-brand-700:  #4A2BD0;   /* hover, pressed                               */
+  --syn-brand-link-dark: #A98CFF; /* link colour on dark grounds only          */
+
+  /* --- ink ----------------------------------------------------------------- */
+  --syn-ink-900:    #17123A;   /* hero band; becomes the dark surface          */
+  --syn-ink-950:    #0F0B24;   /* dark page ground                             */
+  --syn-ink-800:    #1F1846;   /* dark raised                                  */
+  --syn-ink-700:    #251E52;   /* dark raised, one step up                     */
+  --syn-ink-600:    #2E2660;   /* dark border                                  */
+  --syn-ink-tint:   #1E1746;   /* dark tint surface                            */
+
+  /* --- support: each has a light-ground and a dark-ground variant ----------- */
+  --syn-teal-on-light:  #0E9F8C;
+  --syn-teal-on-dark:   #12B5A0;
+  --syn-amber-on-light: #A96C08;
+  --syn-amber-on-dark:  #E0A63C;
+  --syn-red-on-light:   #C4342E;
+  --syn-red-on-dark:    #F0736C;
+
+  /* --- type ---------------------------------------------------------------- */
+  --syn-font-display: "Bricolage Grotesque", "Plus Jakarta Sans", system-ui, sans-serif;
+  --syn-font-body:    "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --syn-font-mono:    "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* The display face carries h1 and h2 only. From h3 down the page uses the
+     body face at 700 — a long reference page stacks a dozen small headings and
+     the display face turns noisy at that size. */
+  --syn-size-display: 3.5rem;   /* 56 — hero                                   */
+  --syn-size-h1:      2.375rem; /* 38                                          */
+  --syn-size-h2:      1.5rem;   /* 24                                          */
+  --syn-size-h3:      1.125rem; /* 18 — body face, 700                         */
+  --syn-size-body:    1rem;     /* 16                                          */
+  --syn-size-small:   0.844rem; /* 13.5                                        */
+  --syn-size-mono:    0.813rem; /* 13                                          */
+
+  --syn-leading-body: 1.7;
+  --syn-leading-tight: 1.08;
+
+  /* --- geometry ------------------------------------------------------------ */
+  --syn-radius-sm:   7px;
+  --syn-radius-md:   10px;
+  --syn-radius-lg:   14px;
+  --syn-radius-full: 999px;
+
+  --syn-space-1:  4px;
+  --syn-space-2:  8px;
+  --syn-space-3:  12px;
+  --syn-space-4:  16px;   /* card padding                                      */
+  --syn-space-6:  24px;
+  --syn-space-8:  32px;   /* section gap                                       */
+  --syn-space-12: 48px;   /* page gutter                                       */
+  --syn-space-18: 72px;   /* hero padding                                      */
+
+  /* --- touch --------------------------------------------------------------- */
+  /* Minimum tappable height. Desktop rows are deliberately tighter; the media
+     query at the bottom of this file raises them below the mobile breakpoint
+     rather than making the desktop layout loose. */
+  --syn-tap-min: 44px;
+
+  /* --- breakpoints (documented; CSS cannot use vars in media queries) -------- */
+  /*   996px  Docusaurus's own. Sidebar becomes a drawer, TOC hides.
+               Do NOT invent a different one for the docs shell.
+       640px  The landing page's own. Grids collapse, buttons go full width. */
+}
+
+/* =============================================================================
+   SEMANTIC LAYER — light
+   Everything below this line is what components should actually reference.
+   ========================================================================== */
+
+:root {
+  --syn-surface:        #FFFFFF;
+  --syn-surface-subtle: #FAFAFC;
+  --syn-surface-tint:   var(--syn-brand-50);
+  --syn-surface-raised: #FFFFFF;
+  --syn-border:         #E8E5F2;
+  --syn-border-subtle:  #EEECF5;
+
+  --syn-text:           #14121F;  /* 17.8:1 */
+  --syn-text-body:      #3A3550;
+  --syn-text-secondary: #5F5A78;  /*  6.4:1 */
+  --syn-text-muted:     #6F6A85;  /*  5.1:1 */
+  --syn-link:           var(--syn-brand-600); /* 6.2:1 */
+  --syn-link-hover:     var(--syn-brand-700);
+
+  --syn-code-bg:        #F4F2FA;
+  --syn-codeblock-bg:   var(--syn-ink-900); /* code is always dark, both themes */
+
+  --syn-success: var(--syn-teal-on-light);
+  --syn-warning: var(--syn-amber-on-light);
+  --syn-danger:  var(--syn-red-on-light);
+}
+
+/* =============================================================================
+   SEMANTIC LAYER — dark
+   The hero band does not change between themes. In dark mode its own colour
+   becomes the page surface, and everything that was white drops beneath it.
+   ========================================================================== */
+
+[data-theme='dark'] {
+  --syn-surface:        var(--syn-ink-950);
+  --syn-surface-subtle: var(--syn-ink-900);
+  --syn-surface-tint:   var(--syn-ink-tint);
+  --syn-surface-raised: var(--syn-ink-900);
+  --syn-border:         var(--syn-ink-600);
+  --syn-border-subtle:  #221B4C;
+
+  --syn-text:           #F3F1FA;  /* 16.9:1 */
+  --syn-text-body:      #C9C3E4;
+  --syn-text-secondary: #B5AED6;  /*  9.1:1 */
+  --syn-text-muted:     #9C94C6;  /*  6.5:1 */
+  --syn-link:           var(--syn-brand-link-dark); /* 7.3:1 */
+  --syn-link-hover:     #C4B0FF;
+
+  --syn-code-bg:        var(--syn-ink-tint);
+  --syn-codeblock-bg:   #0A0719;
+
+  --syn-success: var(--syn-teal-on-dark);
+  --syn-warning: var(--syn-amber-on-dark);
+  --syn-danger:  var(--syn-red-on-dark);
+}
+
+/* =============================================================================
+   INFIMA MAPPING — drives the Docusaurus chrome
+   ========================================================================== */
+
+:root {
+  --ifm-color-primary:         var(--syn-brand-600);
+  --ifm-color-primary-dark:    var(--syn-brand-700);
+  --ifm-color-primary-darker:  #4326BE;
+  --ifm-color-primary-darkest: #371F9C;
+  --ifm-color-primary-light:   var(--syn-brand-500);
+  --ifm-color-primary-lighter: #8B70FF;
+  --ifm-color-primary-lightest: var(--syn-brand-200);
+
+  --ifm-background-color:         var(--syn-surface);
+  --ifm-background-surface-color: var(--syn-surface-raised);
+  --ifm-font-color-base:          var(--syn-text-body);
+  --ifm-font-color-secondary:     var(--syn-text-secondary);
+  --ifm-heading-color:            var(--syn-text);
+
+  --ifm-font-family-base:      var(--syn-font-body);
+  --ifm-font-family-monospace: var(--syn-font-mono);
+  --ifm-heading-font-family:   var(--syn-font-display);
+  --ifm-heading-font-weight:   700;
+  --ifm-font-size-base:        var(--syn-size-body);
+  --ifm-line-height-base:      var(--syn-leading-body);
+  --ifm-code-font-size:        var(--syn-size-mono);
+
+  --ifm-link-color:       var(--syn-link);
+  --ifm-link-hover-color: var(--syn-link-hover);
+
+  --ifm-global-radius:    var(--syn-radius-md);
+  --ifm-toc-border-color:   var(--syn-border-subtle);
+  --ifm-table-border-color: var(--syn-border);
+  --ifm-blockquote-color:   var(--syn-text-secondary);
+  --ifm-blockquote-border-color: var(--syn-brand-200);
+  --ifm-code-background:  var(--syn-code-bg);
+  --ifm-pre-background:   var(--syn-codeblock-bg);
+
+  --ifm-menu-color:                  var(--syn-text-secondary);
+  --ifm-menu-color-active:           var(--syn-brand-600);
+  --ifm-menu-color-background-active: var(--syn-brand-50);
+  --ifm-menu-color-background-hover: #F4F2FA;
+
+  /* The navbar is the hero band. It stays dark in BOTH themes — that is the
+     single rule the whole theme hangs off, so do not override it per-theme. */
+  --ifm-navbar-background-color: var(--syn-ink-900);
+  --ifm-navbar-link-color:       #A9A2C9;
+  --ifm-navbar-link-hover-color: #FFFFFF;
+  --ifm-navbar-height:           66px;
+
+  --docusaurus-highlighted-code-line-bg: var(--syn-ink-700);
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary:         var(--syn-brand-500);
+  --ifm-color-primary-dark:    var(--syn-brand-600);
+  --ifm-color-primary-light:   var(--syn-brand-link-dark);
+  --ifm-color-primary-lightest: #C4B0FF;
+
+  --ifm-menu-color-active:            #C4B0FF;
+  --ifm-menu-color-background-active: var(--syn-ink-tint);
+  --ifm-menu-color-background-hover:  var(--syn-ink-tint);
+
+  --docusaurus-highlighted-code-line-bg: var(--syn-ink-700);
+}
+
+/* =============================================================================
+   SHADCN MAPPING — for the landing page and any custom React surface
+   Same values, shadcn's names. Add a `tw-` prefix to Tailwind and disable its
+   preflight; Infima owns the base layer.
+   ========================================================================== */
+
+:root {
+  --background:         var(--syn-surface);
+  --foreground:         var(--syn-text);
+  --card:               var(--syn-surface-raised);
+  --card-foreground:    var(--syn-text);
+  --popover:            var(--syn-surface-raised);
+  --popover-foreground: var(--syn-text);
+  --primary:            var(--syn-brand-600);
+  --primary-foreground: #FFFFFF;
+  --secondary:          var(--syn-brand-50);
+  --secondary-foreground: var(--syn-brand-700);
+  --muted:              var(--syn-surface-subtle);
+  --muted-foreground:   var(--syn-text-muted);
+  --accent:             var(--syn-surface-tint);
+  --accent-foreground:  var(--syn-brand-700);
+  --destructive:        var(--syn-danger);
+  --border:             var(--syn-border);
+  --input:              var(--syn-border);
+  --ring:               var(--syn-brand-200);
+  --radius:             var(--syn-radius-md);
+}
+
+[data-theme='dark'] {
+  --primary:            var(--syn-brand-600);
+  --primary-foreground: #FFFFFF;
+  --secondary:          var(--syn-ink-700);
+  --secondary-foreground: var(--syn-text);
+  --ring:               #3D3568;
+}
+
+/* =============================================================================
+   THE ONE RULE INFIMA CANNOT EXPRESS
+   The display face stops at h2. Infima applies --ifm-heading-font-family to
+   every heading level, so h3 and below are reset here by hand.
+   ========================================================================== */
+
+.markdown h3,
+.markdown h4,
+.markdown h5,
+.markdown h6 {
+  font-family: var(--syn-font-body);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.markdown h1 { letter-spacing: -0.033em; line-height: var(--syn-leading-tight); }
+.markdown h2 { letter-spacing: -0.024em; font-weight: 600; }
+
+/* =============================================================================
+   OVERFLOW — the page body never scrolls sideways
+   Infima does NOT do this for tables. One wide table pushes the whole document
+   and every page on the site starts scrolling horizontally on a phone. Code
+   blocks already scroll; tables have to be told to.
+   ========================================================================== */
+
+.markdown table {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.markdown pre,
+.markdown .prism-code {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+/* =============================================================================
+   TOUCH — below the Docusaurus breakpoint
+   Desktop uses ~30px rows, which is right with a mouse and fails on a phone.
+   Raise them here rather than loosening the desktop layout.
+   ========================================================================== */
+
+@media (max-width: 996px) {
+  .menu__link,
+  .navbar__item,
+  .navbar__link,
+  .theme-doc-sidebar-item-link a,
+  .theme-doc-sidebar-item-category > div > a,
+  .pagination-nav__link,
+  .footer__link-item,
+  .tabs__item {
+    min-height: var(--syn-tap-min);
+    display: flex;
+    align-items: center;
+  }
+
+  /* Icon-only controls need width as well as height. */
+  .navbar__toggle,
+  .clean-btn,
+  .navbar-sidebar__close {
+    min-width: var(--syn-tap-min);
+    min-height: var(--syn-tap-min);
+  }
+
+  /* The version selector pins to the top of the drawer and does not scroll
+     away with the nav tree — on a phone it is the only signal that you are
+     reading an older version. */
+  .navbar-sidebar__items .dropdown--version,
+  .navbar-sidebar .navbar__item.dropdown {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--syn-surface-subtle);
+    border-bottom: 1px solid var(--syn-border-subtle);
+  }
+
+  /* Language tabs scroll rather than wrapping into a ragged block. */
+  .tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tabs__item { flex-shrink: 0; }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --syn-size-display: 2.125rem; /* 34 — hero headline                        */
+    --syn-size-h1:      1.875rem; /* 30                                        */
+    --syn-size-h2:      1.313rem; /* 21                                        */
+    --syn-space-12:     16px;     /* page gutter                               */
+    --syn-space-18:     36px;     /* hero padding                              */
+  }
+}

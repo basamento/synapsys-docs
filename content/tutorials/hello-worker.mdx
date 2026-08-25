@@ -1,0 +1,68 @@
+---
+title: 1. Hello worker
+description: Register an application with the Core and watch it appear.
+sidebar_position: 1
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# 1. Hello worker
+
+The smallest useful thing: an application that introduces itself to the Core and
+keeps saying it is alive. No processes yet.
+
+You need a Core running — see [Run the Core](/docs/start/run-the-core).
+
+## Connect
+
+<Tabs groupId="connection">
+<TabItem value="spring-boot" label="Spring Boot">
+
+Add the starter, then:
+
+```yaml title="application.yaml"
+spring:
+  application:
+    name: hello-worker
+
+synapsys:
+  core-url: http://localhost:8080
+```
+
+Start the application. That is all — the starter begins heartbeating on boot.
+
+</TabItem>
+<TabItem value="raw-api" label="Raw API">
+
+```bash
+BODY='{"workerName":"hello-worker","framework":"curl","host":"laptop","heartbeatInterval":5,"processes":[]}'
+
+while true; do
+  curl -s -X POST http://localhost:8080/api/v1/workers/heartbeat \\
+       -H 'Content-Type: application/json' -d "$BODY"
+  sleep 5
+done
+```
+
+An empty `processes` array is valid. A worker with no processes is still a worker.
+
+</TabItem>
+</Tabs>
+
+## What you should see
+
+Open http://localhost:8080. Within five seconds `hello-worker` appears, marked
+active, with no processes.
+
+Stop the application — or press Ctrl-C on the loop — and the worker goes inactive
+shortly after. Nothing told the Core it was leaving; it simply stopped hearing
+from it.
+
+## What just happened
+
+There was no registration step. The first heartbeat created the worker, and every
+heartbeat after it renewed the liveness. This is why `workerName` must be stable:
+change it and the Core sees a different worker, not the same one renamed.
+
+Next: [an endless process](./endless-process).

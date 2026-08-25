@@ -1,0 +1,458 @@
+/**
+ * The design system is the source of truth and lives in design/tokens.css.
+ * It is imported, never copied — edit it there.
+ *
+ * tokens.css defines the --syn-* layer and maps it onto both Infima
+ * (--ifm-*) and shadcn (--background, --primary, ...). Everything below is
+ * only the handful of things a variable cannot express.
+ */
+@import '../../design/tokens.css';
+
+/* -----------------------------------------------------------------------------
+   Fonts. Google Fonts is the one external host the design depends on; each
+   face has a real fallback with close metrics so a blocked load degrades
+   quietly rather than reflowing the page.
+   -------------------------------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+/* -----------------------------------------------------------------------------
+   DIMENSIONS
+   tokens.css carries the type scale and spacing; Infima has its own defaults for
+   all of it and wins unless each one is wired across explicitly. Without this
+   block the site renders at Infima's sizes with only our colours and fonts,
+   which is not the design.
+   -------------------------------------------------------------------------- */
+:root {
+  /* Type scale — design/tokens.css §type */
+  --ifm-h1-font-size: var(--syn-size-h1);      /* 38px, not Infima's 48 */
+  --ifm-h2-font-size: var(--syn-size-h2);      /* 24px, not Infima's 32 */
+  --ifm-h3-font-size: var(--syn-size-h3);      /* 18px */
+  --ifm-h4-font-size: 1rem;
+  --ifm-h5-font-size: 0.875rem;
+  --ifm-h6-font-size: 0.8125rem;
+
+  --ifm-heading-line-height: 1.15;
+  --ifm-heading-margin-top: var(--syn-space-8);
+  --ifm-heading-margin-bottom: var(--syn-space-3);
+  --ifm-paragraph-margin-bottom: var(--syn-space-4);
+
+  /* Rails — mock: 264 sidebar, 206 TOC */
+  --doc-sidebar-width: 264px;
+  --syn-toc-width: 206px;
+
+  /* Gutters. NOTE: --ifm-spacing-horizontal is deliberately NOT overridden.
+     It drives Infima's grid — .row negative margins and .col padding — so
+     raising it to a page gutter inflates every column on the site, including
+     the footer, until they wrap. Page gutters are set per-region instead. */
+  --ifm-navbar-padding-horizontal: var(--syn-space-12);
+  --ifm-navbar-padding-vertical: 0;
+}
+
+@media (max-width: 996px) {
+  :root {
+    --ifm-navbar-padding-horizontal: var(--syn-space-4);
+  }
+}
+
+/* Docusaurus centres the doc container inside a max-width, which at anything
+   above ~1300px leaves a wide empty gutter between the sidebar and the text and
+   pushes the column away from the rail. The mock has content sitting directly
+   after the sidebar, so the container fills the space between the two rails and
+   the measure is capped on the text itself instead. */
+[class*='docMainContainer'] .container {
+  max-width: none;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.theme-doc-markdown {
+  max-width: 780px;
+  /* No padding here — docItemCol already provides it, and padding on both
+     nests and doubles the gutter. */
+  padding: 0;
+}
+
+/* Content column — mock: 26px top, 40px sides, 48px bottom. */
+[class*='docItemCol'] {
+  padding: var(--syn-space-6) 40px var(--syn-space-12);
+}
+
+@media (max-width: 996px) {
+  [class*='docItemCol'] {
+    padding: var(--syn-space-4) var(--syn-space-4) var(--syn-space-8);
+  }
+}
+
+/* TOC rail */
+.theme-doc-toc-desktop {
+  width: var(--syn-toc-width);
+  max-width: var(--syn-toc-width);
+  padding-top: var(--syn-space-6);
+}
+
+.table-of-contents {
+  font-size: 0.78rem;
+  border-left: none;
+  padding-left: 0;
+}
+
+.table-of-contents__link {
+  padding: 5px 0 5px 10px;
+  border-left: 2px solid transparent;
+  display: block;
+}
+
+.table-of-contents__link--active {
+  border-left-color: var(--syn-link);
+  font-weight: 600;
+}
+
+/* Docusaurus re-declares these two variables on more specific selectors than
+   :root, so setting them once above is not enough — theme-classic ships
+   `.markdown h1:first-child { --ifm-h1-font-size: 3rem }` and
+   `.markdown > h2 { --ifm-h2-font-size: 2rem }`, and both beat :root.
+   Without these three lines the page renders at Infima's scale, not ours. */
+.markdown h1:first-child {
+  --ifm-h1-font-size: var(--syn-size-h1);
+}
+
+.markdown > h2 {
+  --ifm-h2-font-size: var(--syn-size-h2);
+}
+
+.markdown > h3 {
+  --ifm-h3-font-size: var(--syn-size-h3);
+}
+
+/* The lead paragraph — the one immediately after the page title — is a step up
+   from body text. It is what a reader arriving from search reads first.
+   The title is wrapped in <header>, so this is header + p, not h1 + p. */
+.markdown > header + p {
+  font-size: 1.06rem;
+  line-height: 1.62;
+  color: var(--syn-text-body);
+}
+
+/* Breadcrumbs sit tight above the title rather than floating. */
+.theme-doc-breadcrumbs {
+  margin-bottom: var(--syn-space-3) !important;
+  font-size: 0.78rem;
+}
+
+.breadcrumbs__item:not(:last-child) .breadcrumbs__link {
+  color: var(--syn-text-muted);
+  background: none;
+  padding-left: 0;
+}
+
+.breadcrumbs__item--active .breadcrumbs__link {
+  background: none;
+  color: var(--syn-text-secondary);
+  padding-left: 0;
+}
+
+.breadcrumbs__item--active .breadcrumbs__link:hover {
+  background: none;
+}
+
+/* -----------------------------------------------------------------------------
+   Code blocks are dark in BOTH themes. The Prism theme paints its own
+   background, so it has to be overridden back to the token.
+   -------------------------------------------------------------------------- */
+.theme-code-block,
+.theme-code-block pre,
+div[class^='codeBlockContainer'] pre {
+  background-color: var(--syn-codeblock-bg) !important;
+}
+
+div[class^='codeBlockTitle'] {
+  background-color: var(--syn-ink-700);
+  color: var(--syn-text-muted);
+  border-bottom: 1px solid var(--syn-ink-600);
+}
+
+/* Inline code keeps the light tinted ground; only fenced blocks go dark.
+   `:not(pre) >` is load-bearing: Docusaurus wraps fenced code in
+   <pre><code class="codeBlockLines_...">, which has no `language-` class, so a
+   plain `code:not([class*='language-'])` selector paints the light inline
+   background straight over every dark code block. */
+.markdown :not(pre) > code {
+  background-color: var(--syn-code-bg);
+  border: none;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+}
+
+/* -----------------------------------------------------------------------------
+   Navbar. It is the hero band and stays dark in both themes, so its contents
+   need light treatment regardless of the active theme.
+   -------------------------------------------------------------------------- */
+.navbar {
+  border-bottom: none;
+  box-shadow: none;
+}
+
+.navbar__title,
+.navbar__brand {
+  color: #ffffff;
+  font-family: var(--syn-font-display);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+.navbar__link {
+  font-weight: 500;
+}
+
+.navbar__link:hover,
+.navbar__link--active {
+  color: #ffffff;
+}
+
+.navbar__toggle,
+.navbar__search-input {
+  color: var(--syn-text-secondary);
+}
+
+/* The dropdown menu itself is a normal light/dark surface, not part of the band. */
+.navbar .dropdown__menu {
+  background-color: var(--syn-surface-raised);
+  border: 1px solid var(--syn-border);
+}
+
+.navbar .dropdown__link {
+  color: var(--syn-text-body);
+}
+
+/* -----------------------------------------------------------------------------
+   Sidebar — mock: 40px left gutter, 13.5px items on 7/10 padding, 7px radius,
+   group labels small and tracked out.
+   -------------------------------------------------------------------------- */
+.theme-doc-sidebar-container {
+  border-right: 1px solid var(--syn-border-subtle) !important;
+}
+
+.menu {
+  font-weight: 400;
+  padding: var(--syn-space-6) var(--syn-space-4) var(--syn-space-12) var(--syn-space-12) !important;
+}
+
+@media (max-width: 996px) {
+  .menu {
+    padding: var(--syn-space-3) var(--syn-space-3) var(--syn-space-8) !important;
+  }
+}
+
+.menu__list .menu__list {
+  padding-left: var(--syn-space-2);
+}
+
+.menu__link {
+  border-radius: var(--syn-radius-sm);
+  font-size: 0.84rem;
+  padding: 7px 10px;
+  line-height: 1.45;
+}
+
+.menu__link--active:not(.menu__link--sublist) {
+  background: var(--syn-surface-tint);
+  font-weight: 600;
+}
+
+/* Category headings read as small tracked-out labels, not as links. Docusaurus
+   still wraps them in .menu__list-item-collapsible even when collapsible is
+   false, so both the wrapper and the inner link have to be covered. */
+.theme-doc-sidebar-item-category-level-1 > .menu__list-item-collapsible > .menu__link,
+.theme-doc-sidebar-item-category-level-1 > .menu__link--sublist {
+  font-size: 0.69rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--syn-text-muted);
+  padding: 0 10px 6px;
+  margin-top: var(--syn-space-4);
+  background: none !important;
+}
+
+.theme-doc-sidebar-item-category-level-1 > .menu__list-item-collapsible:hover,
+.theme-doc-sidebar-item-category-level-1 > .menu__list-item-collapsible > .menu__link:hover {
+  background: none;
+  color: var(--syn-text-muted);
+}
+
+/* First group needs no top margin. */
+.menu > .menu__list > .menu__list-item:first-child > .menu__list-item-collapsible > .menu__link {
+  margin-top: 0;
+}
+
+/* Nested list sits flush under its label rather than indented away from it. */
+.theme-doc-sidebar-item-category-level-1 > .menu__list {
+  padding-left: 0;
+}
+
+/* -----------------------------------------------------------------------------
+   Footer — Infima centres it inside a fluid container. The mock has the columns
+   left-aligned on the same 1200 grid as the rest of the page.
+   -------------------------------------------------------------------------- */
+.footer {
+  background: var(--syn-surface);
+  border-top: 1px solid var(--syn-border-subtle);
+  padding: 40px var(--syn-space-12) 46px;
+}
+
+.footer .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.footer__links {
+  margin: 0 0 var(--syn-space-6);
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 0 64px;
+}
+
+/* Infima's .col grows to fill and carries grid padding. Neither is wanted here
+   — the footer columns size to their content and sit next to each other. */
+.footer__col {
+  flex: 0 0 auto;
+  width: auto;
+  max-width: none;
+  padding: 0;
+  margin-bottom: var(--syn-space-6);
+}
+
+.footer__title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--syn-text-muted);
+  margin-bottom: var(--syn-space-2);
+}
+
+.footer__item {
+  font-size: 0.84rem;
+  padding: 4px 0;
+}
+
+.footer__link-item {
+  color: var(--syn-text-secondary);
+}
+
+.footer__bottom {
+  text-align: left !important;
+}
+
+.footer__copyright {
+  font-size: 0.81rem;
+  color: var(--syn-text-muted);
+}
+
+/* -----------------------------------------------------------------------------
+   Admonitions — flat tinted grounds, no left-border-accent bar.
+   -------------------------------------------------------------------------- */
+.theme-admonition {
+  border: none;
+  border-radius: var(--syn-radius-md);
+  box-shadow: none;
+  padding: 14px 16px;
+}
+
+.theme-admonition .admonitionHeading_node_modules-\@docusaurus-theme-classic-lib-theme-Admonition-Layout-styles-module,
+.theme-admonition [class*='admonitionHeading'] {
+  font-size: 0.81rem;
+  font-weight: 700;
+  text-transform: none;
+  margin-bottom: 3px;
+}
+
+.theme-admonition p {
+  font-size: 0.88rem;
+  line-height: 1.6;
+  margin-bottom: 0;
+}
+
+/* -----------------------------------------------------------------------------
+   Tables — bordered card, tinted header. Infima ships neither.
+   -------------------------------------------------------------------------- */
+.markdown table thead {
+  background: var(--syn-surface-subtle);
+}
+
+.markdown table thead tr {
+  border-bottom: 1px solid var(--syn-border);
+}
+
+.markdown table th,
+.markdown table td {
+  border: none;
+  border-bottom: 1px solid var(--syn-border-subtle);
+  padding: 11px 16px;
+  font-size: 0.88rem;
+}
+
+.markdown table th {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--syn-text-secondary);
+}
+
+.markdown table tr {
+  background: transparent !important;
+  border-top: none;
+}
+
+.markdown table {
+  border: 1px solid var(--syn-border);
+  border-radius: var(--syn-radius-md);
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+}
+
+/* -----------------------------------------------------------------------------
+   Prev / next — cards, matching the mock.
+   -------------------------------------------------------------------------- */
+.pagination-nav__link {
+  border: 1px solid var(--syn-border);
+  border-radius: var(--syn-radius-md);
+  padding: 14px 18px;
+}
+
+.pagination-nav__sublabel {
+  font-size: 0.75rem;
+  color: var(--syn-text-muted);
+  margin-bottom: 3px;
+}
+
+.pagination-nav__label {
+  font-size: 0.91rem;
+  font-weight: 600;
+  color: var(--syn-link);
+}
+
+/* -----------------------------------------------------------------------------
+   Language tabs — pill-shaped, matching the code-block tab row in the mock.
+   -------------------------------------------------------------------------- */
+.tabs {
+  border-bottom: 1px solid var(--syn-border-subtle);
+  gap: 3px;
+}
+
+.tabs__item {
+  border-bottom: none;
+  border-radius: var(--syn-radius-sm) var(--syn-radius-sm) 0 0;
+  font-size: 0.84rem;
+  font-weight: 500;
+  padding: 8px 15px;
+  color: var(--syn-text-secondary);
+}
+
+.tabs__item--active {
+  background: var(--syn-surface-tint);
+  color: var(--syn-link);
+  font-weight: 600;
+  border-bottom: 2px solid var(--syn-link);
+}

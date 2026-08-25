@@ -1,0 +1,182 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; font-family: "Plus Jakarta Sans", system-ui, sans-serif; }
+    a { color: #5F3DF2; } a:hover { color: #4A2BD0; }
+  </style>
+</helmet>
+
+<div style="width: 1200px; background: #FFFFFF; color: #14121F; padding: 44px 48px 52px; box-sizing: border-box; display: flex; flex-direction: column; gap: 40px;">
+
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.14em; color: #A9A4BE;">SYNAPSYS DOCS &middot; DESIGN TOKENS</div>
+    <div style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 700; letter-spacing: -0.03em;">Tokens</div>
+    <p style="margin: 0; font-size: 14.5px; line-height: 1.6; color: #5F5A78; max-width: 76ch;">One layer feeds both systems. Every value below becomes a CSS custom property that Infima&rsquo;s <code style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; background: #F4F2FA; padding: 1px 5px; border-radius: 4px;">--ifm-*</code> variables and shadcn&rsquo;s <code style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; background: #F4F2FA; padding: 1px 5px; border-radius: 4px;">--background</code> / <code style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; background: #F4F2FA; padding: 1px 5px; border-radius: 4px;">--primary</code> both read from &mdash; so the docs chrome and the landing page cannot drift apart.</p>
+  </div>
+
+  <div style="height: 1px; background: #EEECF5;"></div>
+
+  <!-- BRAND RAMP -->
+  <div style="display: flex; flex-direction: column; gap: 16px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.13em; color: #A9A4BE;">BRAND &mdash; VIOLET</div>
+    <div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px;">
+      <div style="display: flex; flex-direction: column; gap: 7px;"><div style="height: 62px; border-radius: 10px; background: #F2EFFF; border: 1px solid #E8E5F2;"></div><div style="font-size: 12px; font-weight: 600;">brand-50</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7C7793;">#F2EFFF</div><div style="font-size: 10.5px; color: #A9A4BE;">tint surfaces</div></div>
+      <div style="display: flex; flex-direction: column; gap: 7px;"><div style="height: 62px; border-radius: 10px; background: #D9CFFF;"></div><div style="font-size: 12px; font-weight: 600;">brand-200</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7C7793;">#D9CFFF</div><div style="font-size: 10.5px; color: #A9A4BE;">borders, rings</div></div>
+      <div style="display: flex; flex-direction: column; gap: 7px;"><div style="height: 62px; border-radius: 10px; background: #7C5CFF;"></div><div style="font-size: 12px; font-weight: 600;">brand-500</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7C7793;">#7C5CFF</div><div style="font-size: 10.5px; color: #A9A4BE;">dark-theme accent</div></div>
+      <div style="display: flex; flex-direction: column; gap: 7px;"><div style="height: 62px; border-radius: 10px; background: #5F3DF2;"></div><div style="font-size: 12px; font-weight: 600;">brand-600</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7C7793;">#5F3DF2</div><div style="font-size: 10.5px; color: #A9A4BE;">buttons, links</div></div>
+      <div style="display: flex; flex-direction: column; gap: 7px;"><div style="height: 62px; border-radius: 10px; background: #4A2BD0;"></div><div style="font-size: 12px; font-weight: 600;">brand-700</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7C7793;">#4A2BD0</div><div style="font-size: 10.5px; color: #A9A4BE;">hover, pressed</div></div>
+      <div style="display: flex; flex-direction: column; gap: 7px;"><div style="height: 62px; border-radius: 10px; background: #17123A;"></div><div style="font-size: 12px; font-weight: 600;">ink-900</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7C7793;">#17123A</div><div style="font-size: 10.5px; color: #A9A4BE;">hero band &amp; dark surface</div></div>
+    </div>
+  </div>
+
+  <!-- SUPPORT -->
+  <div style="display: flex; flex-direction: column; gap: 16px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.13em; color: #A9A4BE;">SUPPORT &mdash; EACH HAS A LIGHT AND A DARK VARIANT SO TEXT ALWAYS CLEARS ITS GROUND</div>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px;">
+
+      <div style="border: 1px solid #E8E5F2; border-radius: 12px; overflow: hidden;">
+        <div style="display: flex; height: 54px;"><div style="flex-grow: 1; background: #0E9F8C;"></div><div style="flex-grow: 1; background: #12B5A0;"></div></div>
+        <div style="padding: 12px 14px; display: flex; flex-direction: column; gap: 5px;">
+          <div style="font-size: 13px; font-weight: 600;">Teal &mdash; running / success</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7C7793;">#0E9F8C on light &middot; #12B5A0 on dark</div>
+        </div>
+      </div>
+
+      <div style="border: 1px solid #E8E5F2; border-radius: 12px; overflow: hidden;">
+        <div style="display: flex; height: 54px;"><div style="flex-grow: 1; background: #A96C08;"></div><div style="flex-grow: 1; background: #E0A63C;"></div></div>
+        <div style="padding: 12px 14px; display: flex; flex-direction: column; gap: 5px;">
+          <div style="font-size: 13px; font-weight: 600;">Amber &mdash; stopping / caution</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7C7793;">#A96C08 on light &middot; #E0A63C on dark</div>
+        </div>
+      </div>
+
+      <div style="border: 1px solid #E8E5F2; border-radius: 12px; overflow: hidden;">
+        <div style="display: flex; height: 54px;"><div style="flex-grow: 1; background: #C4342E;"></div><div style="flex-grow: 1; background: #F0736C;"></div></div>
+        <div style="padding: 12px 14px; display: flex; flex-direction: column; gap: 5px;">
+          <div style="font-size: 13px; font-weight: 600;">Red &mdash; failed / danger</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7C7793;">#C4342E on light &middot; #F0736C on dark</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height: 1px; background: #EEECF5;"></div>
+
+  <!-- SURFACES: LIGHT vs DARK -->
+  <div style="display: flex; flex-direction: column; gap: 16px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.13em; color: #A9A4BE;">SURFACES &mdash; THE DARK THEME RULE</div>
+    <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #5F5A78; max-width: 84ch;">The hero band does not change between themes. In dark mode the band&rsquo;s own colour becomes the page surface, and everything that was white moves down onto <code style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; background: #F4F2FA; padding: 1px 5px; border-radius: 4px;">#0F0B24</code>. The band stops being a band and becomes the ground.</p>
+
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px;">
+
+      <div style="border: 1px solid #E8E5F2; border-radius: 14px; overflow: hidden;">
+        <div style="padding: 11px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: 0.12em; color: #7C7793; border-bottom: 1px solid #E8E5F2;">LIGHT</div>
+        <div style="display: flex; flex-direction: column;">
+          <div style="background: #FFFFFF; padding: 13px 16px; display: flex; justify-content: space-between; align-items: center;"><span style="font-size: 12.5px; font-weight: 600;">page</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #7C7793;">#FFFFFF</span></div>
+          <div style="background: #FAFAFC; padding: 13px 16px; display: flex; justify-content: space-between; align-items: center;"><span style="font-size: 12.5px; font-weight: 600;">subtle</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #7C7793;">#FAFAFC</span></div>
+          <div style="background: #F2EFFF; padding: 13px 16px; display: flex; justify-content: space-between; align-items: center;"><span style="font-size: 12.5px; font-weight: 600;">tint</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #7C7793;">#F2EFFF</span></div>
+          <div style="background: #17123A; padding: 13px 16px; display: flex; justify-content: space-between; align-items: center;"><span style="font-size: 12.5px; font-weight: 600; color: #FFFFFF;">hero band</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #B5AED6;">#17123A</span></div>
+          <div style="background: #FFFFFF; padding: 13px 16px; border-top: 1px solid #E8E5F2; display: flex; justify-content: space-between; align-items: center;"><span style="font-size: 12.5px; color: #5F5A78;">border</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #7C7793;">#E8E5F2</span></div>
+        </div>
+      </div>
+
+      <div style="border: 1px solid #2E2660; border-radius: 14px; overflow: hidden; background: #0F0B24;">
+        <div style="padding: 11px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: 0.12em; color: #8C85B4; border-bottom: 1px solid #2E2660;">DARK</div>
+        <div style="display: flex; flex-direction: column;">
+          <div style="background: #0F0B24; padding: 13px 16px; display: flex; justify-content: space-between; align-items: center;"><span style="font-size: 12.5px; font-weight: 600; color: #F3F1FA;">page</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8C85B4;">#0F0B24</span></div>
+          <div style="background: #17123A; padding: 13px 16px; display: flex; justify-content: space-between; align-items: center;"><span style="font-size: 12.5px; font-weight: 600; color: #F3F1FA;">subtle &middot; hero band</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8C85B4;">#17123A</span></div>
+          <div style="background: #251E52; padding: 13px 16px; display: flex; justify-content: space-between; align-items: center;"><span style="font-size: 12.5px; font-weight: 600; color: #F3F1FA;">raised</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #A9A2C9;">#251E52</span></div>
+          <div style="background: #1E1746; padding: 13px 16px; display: flex; justify-content: space-between; align-items: center;"><span style="font-size: 12.5px; font-weight: 600; color: #F3F1FA;">tint</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #A9A2C9;">#1E1746</span></div>
+          <div style="background: #0F0B24; padding: 13px 16px; border-top: 1px solid #2E2660; display: flex; justify-content: space-between; align-items: center;"><span style="font-size: 12.5px; color: #B5AED6;">border</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #8C85B4;">#2E2660</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height: 1px; background: #EEECF5;"></div>
+
+  <!-- TEXT + CONTRAST -->
+  <div style="display: flex; flex-direction: column; gap: 16px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.13em; color: #A9A4BE;">TEXT &mdash; EVERY PAIR MEETS WCAG AA ON ITS OWN GROUND</div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px;">
+
+      <div style="background: #FFFFFF; border: 1px solid #E8E5F2; border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 13px;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="font-size: 15px; color: #14121F; font-weight: 600;">Primary &mdash; #14121F</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #0E9F8C;">17.8 : 1</span></div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="font-size: 15px; color: #5F5A78;">Secondary &mdash; #5F5A78</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #0E9F8C;">6.4 : 1</span></div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="font-size: 15px; color: #6F6A85;">Muted &mdash; #6F6A85</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #0E9F8C;">5.1 : 1</span></div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="font-size: 15px; color: #5F3DF2; font-weight: 500;">Link &mdash; #5F3DF2</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #0E9F8C;">6.2 : 1</span></div>
+      </div>
+
+      <div style="background: #0F0B24; border: 1px solid #2E2660; border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 13px;">
+        <div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="font-size: 15px; color: #F3F1FA; font-weight: 600;">Primary &mdash; #F3F1FA</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #12B5A0;">16.9 : 1</span></div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="font-size: 15px; color: #B5AED6;">Secondary &mdash; #B5AED6</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #12B5A0;">9.1 : 1</span></div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="font-size: 15px; color: #9C94C6;">Muted &mdash; #9C94C6</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #12B5A0;">6.5 : 1</span></div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline;"><span style="font-size: 15px; color: #A98CFF; font-weight: 500;">Link &mdash; #A98CFF</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #12B5A0;">7.3 : 1</span></div>
+      </div>
+    </div>
+    <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #7C7793;">The brand violet flips across themes: <code style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: #F4F2FA; padding: 1px 5px; border-radius: 4px;">brand-600</code> for links on white, <code style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: #F4F2FA; padding: 1px 5px; border-radius: 4px;">#A98CFF</code> on dark. The button fill stays <code style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: #F4F2FA; padding: 1px 5px; border-radius: 4px;">brand-600</code> in both, because white-on-violet clears AA either way.</p>
+  </div>
+
+  <div style="height: 1px; background: #EEECF5;"></div>
+
+  <!-- TYPE -->
+  <div style="display: flex; flex-direction: column; gap: 18px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.13em; color: #A9A4BE;">TYPE SCALE &mdash; DISPLAY FACE STOPS AT H2</div>
+    <div style="display: flex; flex-direction: column; gap: 15px;">
+      <div style="display: grid; grid-template-columns: 168px 1fr; gap: 20px; align-items: baseline;"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #A9A4BE;">display / 50 / 700</div><div style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 50px; font-weight: 700; letter-spacing: -0.035em; line-height: 1.03;">Bring every script</div></div>
+      <div style="display: grid; grid-template-columns: 168px 1fr; gap: 20px; align-items: baseline;"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #A9A4BE;">h1 / 34 / 700</div><div style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 34px; font-weight: 700; letter-spacing: -0.03em;">Heartbeat protocol</div></div>
+      <div style="display: grid; grid-template-columns: 168px 1fr; gap: 20px; align-items: baseline;"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #A9A4BE;">h2 / 23 / 600</div><div style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 23px; font-weight: 600; letter-spacing: -0.022em;">Token idempotency</div></div>
+      <div style="display: grid; grid-template-columns: 168px 1fr; gap: 20px; align-items: baseline;"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #A9A4BE;">h3 / 17 / 700 &nbsp;body face</div><div style="font-size: 17px; font-weight: 700; letter-spacing: -0.01em;">Endless versus progressive</div></div>
+      <div style="display: grid; grid-template-columns: 168px 1fr; gap: 20px; align-items: baseline;"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #A9A4BE;">body / 16 / 400</div><div style="font-size: 16px; line-height: 1.68; color: #3A3550; max-width: 62ch;">A worker holds no open port. Every few seconds it posts the state of each process it owns, and the Core replies with what it wants those processes to be doing.</div></div>
+      <div style="display: grid; grid-template-columns: 168px 1fr; gap: 20px; align-items: baseline;"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #A9A4BE;">small / 13.5 / 400</div><div style="font-size: 13.5px; color: #5F5A78;">Sidebar entries, captions, table cells</div></div>
+      <div style="display: grid; grid-template-columns: 168px 1fr; gap: 20px; align-items: baseline;"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #A9A4BE;">mono / 13 / 400</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 13px;">desiredToken &gt; ackToken</div></div>
+    </div>
+    <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #7C7793; max-width: 84ch;">Bricolage Grotesque carries the display sizes and h1&ndash;h2, where its character reads as confidence. From h3 down the page switches to Plus Jakarta Sans at weight 700 &mdash; a long reference page stacks a dozen of these, and the display face turns noisy at that size and repetition.</p>
+  </div>
+
+  <div style="height: 1px; background: #EEECF5;"></div>
+
+  <!-- RADII + SPACING -->
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px;">
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.13em; color: #A9A4BE;">RADII</div>
+      <div style="display: flex; gap: 14px; align-items: flex-end;">
+        <div style="display: flex; flex-direction: column; gap: 7px; align-items: center;"><div style="width: 58px; height: 58px; background: #F2EFFF; border: 1px solid #D9CFFF; border-radius: 7px;"></div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7C7793;">7 &middot; sm</div></div>
+        <div style="display: flex; flex-direction: column; gap: 7px; align-items: center;"><div style="width: 58px; height: 58px; background: #F2EFFF; border: 1px solid #D9CFFF; border-radius: 10px;"></div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7C7793;">10 &middot; md</div></div>
+        <div style="display: flex; flex-direction: column; gap: 7px; align-items: center;"><div style="width: 58px; height: 58px; background: #F2EFFF; border: 1px solid #D9CFFF; border-radius: 14px;"></div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7C7793;">14 &middot; lg</div></div>
+        <div style="display: flex; flex-direction: column; gap: 7px; align-items: center;"><div style="width: 58px; height: 58px; background: #F2EFFF; border: 1px solid #D9CFFF; border-radius: 999px;"></div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7C7793;">full &middot; pill</div></div>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.13em; color: #A9A4BE;">SPACING &mdash; 4PX BASE</div>
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <div style="display: flex; align-items: center; gap: 12px;"><div style="width: 4px; height: 15px; background: #5F3DF2;"></div><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7C7793;">4</span></div>
+        <div style="display: flex; align-items: center; gap: 12px;"><div style="width: 8px; height: 15px; background: #5F3DF2;"></div><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7C7793;">8</span></div>
+        <div style="display: flex; align-items: center; gap: 12px;"><div style="width: 12px; height: 15px; background: #5F3DF2;"></div><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7C7793;">12</span></div>
+        <div style="display: flex; align-items: center; gap: 12px;"><div style="width: 16px; height: 15px; background: #5F3DF2;"></div><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7C7793;">16 &middot; card padding</span></div>
+        <div style="display: flex; align-items: center; gap: 12px;"><div style="width: 24px; height: 15px; background: #5F3DF2;"></div><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7C7793;">24</span></div>
+        <div style="display: flex; align-items: center; gap: 12px;"><div style="width: 32px; height: 15px; background: #5F3DF2;"></div><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7C7793;">32 &middot; section gap</span></div>
+        <div style="display: flex; align-items: center; gap: 12px;"><div style="width: 48px; height: 15px; background: #5F3DF2;"></div><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7C7793;">48 &middot; page gutter</span></div>
+        <div style="display: flex; align-items: center; gap: 12px;"><div style="width: 72px; height: 15px; background: #5F3DF2;"></div><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7C7793;">72 &middot; hero padding</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

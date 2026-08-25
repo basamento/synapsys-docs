@@ -1,0 +1,191 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; font-family: "Plus Jakarta Sans", system-ui, sans-serif; }
+    a { color: #5F3DF2; } a:hover { color: #4A2BD0; }
+  </style>
+</helmet>
+
+<div style="width: 1200px; background: #FFFFFF; color: #14121F; display: flex; flex-direction: column;">
+
+  <div style="background: #17123A; padding: 0 40px; display: flex; align-items: center; justify-content: space-between; height: 66px;">
+    <div style="display: flex; align-items: center; gap: 30px;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <svg width="24" height="24" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="22" fill="#5F3DF2"></circle><path d="M24 24 24 9M24 24 36.99 31.5M24 24 11.01 31.5" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"></path><circle cx="24" cy="24" r="6" fill="#FFFFFF"></circle><circle cx="24" cy="9" r="4" fill="#12B5A0"></circle><circle cx="36.99" cy="31.5" r="4" fill="#12B5A0"></circle><circle cx="11.01" cy="31.5" r="4" fill="#12B5A0"></circle></svg>
+        <span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 18px; color: #FFFFFF; letter-spacing: -0.025em;">Synapsys</span>
+      </div>
+      <div style="display: flex; gap: 22px; font-size: 14px; font-weight: 500; color: #A9A2C9;">
+        <span style="color: #FFFFFF;">Docs</span><span>Tutorials</span><span>Manuals</span><span>Reference</span><span>Blog</span>
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <div style="display: flex; align-items: center; gap: 7px; background: #251E52; border-radius: 999px; padding: 6px 13px; font-size: 12.5px; color: #9C94C6;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9C94C6" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>Search<span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; background: #17123A; padding: 2px 5px; border-radius: 4px; margin-left: 4px;">/</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 500; color: #C7C1E4; background: #251E52; border-radius: 999px; padding: 6px 12px;">v2.1<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#C7C1E4" stroke-width="3"><path d="m6 9 6 6 6-6"></path></svg></div>
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#A9A2C9" stroke-width="1.7"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path></svg>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 264px 1fr 206px;">
+
+    <!-- SIDEBAR -->
+    <div style="border-right: 1px solid #EEECF5; padding: 26px 20px 44px 40px; display: flex; flex-direction: column; gap: 22px;">
+
+      <div style="display: flex; align-items: center; justify-content: space-between; background: #F2EFFF; border: 1px solid #D9CFFF; border-radius: 9px; padding: 9px 12px;">
+        <div style="display: flex; flex-direction: column; gap: 1px;">
+          <span style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.07em; color: #7C5CFF;">CORE</span>
+          <span style="font-size: 13px; font-weight: 600;">v2.1 &middot; latest</span>
+        </div>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#5F3DF2" stroke-width="2.6"><path d="m6 9 6 6 6-6"></path></svg>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 3px;">
+        <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.09em; color: #A9A4BE; padding: 0 10px 6px;">CONCEPTS</div>
+        <div style="font-size: 13.5px; color: #5F5A78; padding: 7px 10px; border-radius: 7px;">Architecture</div>
+        <div style="font-size: 13.5px; color: #5F5A78; padding: 7px 10px; border-radius: 7px;">Neurons &amp; processes</div>
+        <div style="font-size: 13.5px; color: #5F3DF2; font-weight: 600; background: #F2EFFF; padding: 7px 10px; border-radius: 7px;">Heartbeat protocol</div>
+        <div style="font-size: 13.5px; color: #5F5A78; padding: 7px 10px; border-radius: 7px;">Execution states</div>
+        <div style="font-size: 13.5px; color: #5F5A78; padding: 7px 10px; border-radius: 7px;">Actions &amp; runs</div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 3px;">
+        <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.09em; color: #A9A4BE; padding: 0 10px 6px;">GET STARTED</div>
+        <div style="font-size: 13.5px; color: #5F5A78; padding: 7px 10px; border-radius: 7px;">Run the Core</div>
+        <div style="font-size: 13.5px; color: #5F5A78; padding: 7px 10px; border-radius: 7px;">Your first worker</div>
+        <div style="font-size: 13.5px; color: #5F5A78; padding: 7px 10px; border-radius: 7px;">Start and stop a process</div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 3px;">
+        <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.09em; color: #A9A4BE; padding: 0 10px 6px;">MANUALS</div>
+        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13.5px; color: #5F5A78; padding: 7px 10px;">Core<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#A9A4BE" stroke-width="2.4"><path d="m9 6 6 6-6 6"></path></svg></div>
+        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13.5px; color: #5F5A78; padding: 7px 10px;">Spring Boot starter<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#A9A4BE" stroke-width="2.4"><path d="m9 6 6 6-6 6"></path></svg></div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div style="padding: 26px 40px 48px; display: flex; flex-direction: column; gap: 20px; min-width: 0;">
+
+      <div style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: #A9A4BE;">
+        <span>Concepts</span><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#D2CEE0" stroke-width="2.4"><path d="m9 6 6 6-6 6"></path></svg><span style="color: #5F5A78;">Heartbeat protocol</span>
+      </div>
+
+      <div style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 38px; font-weight: 700; letter-spacing: -0.033em; line-height: 1.08;">Heartbeat protocol</div>
+
+      <p style="margin: 0; font-size: 17px; line-height: 1.62; color: #3A3550; text-wrap: pretty;">A worker holds no open port. Every few seconds it posts the state of each process it owns, and the Core replies with what it wants those processes to be doing.</p>
+
+      <div style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 600; letter-spacing: -0.024em; margin-top: 10px;">The loop</div>
+
+      <p style="margin: 0; font-size: 16px; line-height: 1.7; color: #3A3550; text-wrap: pretty;">There is exactly one endpoint. The worker sends every process it knows about in a single batch; the Core answers with a desired state for each. Nothing else is exchanged, and the Core never initiates contact.</p>
+
+      <div style="border-radius: 12px; overflow: hidden; background: #17123A;">
+        <div style="display: flex; padding: 8px 8px 0; gap: 4px; align-items: center;">
+          <div style="padding: 7px 14px; color: #FFFFFF; font-size: 12px; font-weight: 600; background: #251E52; border-radius: 8px;">Request</div>
+          <div style="padding: 7px 14px; color: #8C85B4; font-size: 12px; font-weight: 500;">Response</div>
+          <div style="flex-grow: 1;"></div>
+          <div style="padding: 7px 12px; display: flex; align-items: center; gap: 6px; color: #8C85B4; font-size: 11px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8C85B4" stroke-width="1.8"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>Copy</div>
+        </div>
+        <div style="padding: 14px 20px 20px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; line-height: 1.75; color: #D6D2EA;">
+          <div><span style="color: #E0A63C;">POST</span> /api/v1/workers/heartbeat</div>
+          <div>&nbsp;</div>
+          <div>{</div>
+          <div>&nbsp;&nbsp;<span style="color: #A98CFF;">"workerName"</span>: <span style="color: #12B5A0;">"billing-jobs"</span>,</div>
+          <div>&nbsp;&nbsp;<span style="color: #A98CFF;">"heartbeatInterval"</span>: <span style="color: #12B5A0;">5</span>,</div>
+          <div>&nbsp;&nbsp;<span style="color: #A98CFF;">"processes"</span>: [{</div>
+          <div>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #A98CFF;">"name"</span>: <span style="color: #12B5A0;">"nightly-sync"</span>,</div>
+          <div>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #A98CFF;">"currentState"</span>: <span style="color: #12B5A0;">"running"</span>,</div>
+          <div>&nbsp;&nbsp;&nbsp;&nbsp;<span style="color: #A98CFF;">"ackToken"</span>: <span style="color: #12B5A0;">7</span></div>
+          <div>&nbsp;&nbsp;}]</div>
+          <div>}</div>
+        </div>
+      </div>
+
+      <div style="background: #FFF8EC; border-radius: 12px; padding: 14px 16px; display: flex; gap: 11px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A96C08" stroke-width="1.9" style="flex-shrink: 0; margin-top: 1px;"><path d="M12 9v4M12 17h.01"></path><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"></path></svg>
+        <div style="display: flex; flex-direction: column; gap: 3px;">
+          <div style="font-size: 13px; font-weight: 700; color: #8A5806;">Caution</div>
+          <div style="font-size: 14px; line-height: 1.6; color: #6B5320;">A <code style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; background: #F6E7CC; padding: 1px 5px; border-radius: 4px;">desiredState</code> of <code style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; background: #F6E7CC; padding: 1px 5px; border-radius: 4px;">idle</code> means &ldquo;no command&rdquo;, never &ldquo;stop&rdquo;. Stop is <code style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; background: #F6E7CC; padding: 1px 5px; border-radius: 4px;">stopping</code>.</div>
+        </div>
+      </div>
+
+      <div style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 600; letter-spacing: -0.024em; margin-top: 10px;">Token idempotency</div>
+
+      <p style="margin: 0; font-size: 16px; line-height: 1.7; color: #3A3550; text-wrap: pretty;">Commands are not matched by comparing states, which would replay on every beat. The Core increments a token on each user command, and the worker acts only when that token is newer than the one it last acknowledged.</p>
+
+      <div style="font-size: 18px; font-weight: 700; letter-spacing: -0.01em; margin-top: 6px;">Applying a command</div>
+
+      <div style="display: flex; flex-direction: column; gap: 9px;">
+        <div style="display: flex; gap: 12px; font-size: 15.5px; line-height: 1.6; color: #3A3550;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #5F3DF2; flex-shrink: 0; padding-top: 2px;">1.</span><span>Compare <code style="font-family: 'IBM Plex Mono', monospace; font-size: 13.5px; background: #F4F2FA; padding: 1px 5px; border-radius: 4px;">desiredToken</code> against the stored <code style="font-family: 'IBM Plex Mono', monospace; font-size: 13.5px; background: #F4F2FA; padding: 1px 5px; border-radius: 4px;">ackToken</code>.</span></div>
+        <div style="display: flex; gap: 12px; font-size: 15.5px; line-height: 1.6; color: #3A3550;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #5F3DF2; flex-shrink: 0; padding-top: 2px;">2.</span><span>If it is not greater, ignore the command entirely &mdash; it is a duplicate.</span></div>
+        <div style="display: flex; gap: 12px; font-size: 15.5px; line-height: 1.6; color: #3A3550;"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #5F3DF2; flex-shrink: 0; padding-top: 2px;">3.</span><span>Otherwise apply it, set <code style="font-family: 'IBM Plex Mono', monospace; font-size: 13.5px; background: #F4F2FA; padding: 1px 5px; border-radius: 4px;">ackToken</code> to the new value, and report it on the next beat.</span></div>
+      </div>
+
+      <div style="border: 1px solid #E8E5F2; border-radius: 12px; overflow: hidden; margin-top: 8px;">
+        <div style="display: grid; grid-template-columns: 150px 1fr 130px; background: #FAFAFC; border-bottom: 1px solid #E8E5F2;">
+          <div style="padding: 10px 16px; font-size: 12.5px; font-weight: 700; color: #5F5A78;">State</div>
+          <div style="padding: 10px 16px; font-size: 12.5px; font-weight: 700; color: #5F5A78;">Meaning</div>
+          <div style="padding: 10px 16px; font-size: 12.5px; font-weight: 700; color: #5F5A78;">Commandable</div>
+        </div>
+        <div style="display: grid; grid-template-columns: 150px 1fr 130px; border-bottom: 1px solid #EEECF5;">
+          <div style="padding: 11px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #14121F;">idle</div>
+          <div style="padding: 11px 16px; font-size: 14px; color: #3A3550;">Not running; no command outstanding</div>
+          <div style="padding: 11px 16px; font-size: 13.5px; color: #0E9F8C; font-weight: 600;">yes</div>
+        </div>
+        <div style="display: grid; grid-template-columns: 150px 1fr 130px; border-bottom: 1px solid #EEECF5;">
+          <div style="padding: 11px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #14121F;">running</div>
+          <div style="padding: 11px 16px; font-size: 14px; color: #3A3550;">Executing now</div>
+          <div style="padding: 11px 16px; font-size: 13.5px; color: #0E9F8C; font-weight: 600;">yes</div>
+        </div>
+        <div style="display: grid; grid-template-columns: 150px 1fr 130px; border-bottom: 1px solid #EEECF5;">
+          <div style="padding: 11px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #14121F;">stopping</div>
+          <div style="padding: 11px 16px; font-size: 14px; color: #3A3550;">Stop requested, not yet finished</div>
+          <div style="padding: 11px 16px; font-size: 13.5px; color: #0E9F8C; font-weight: 600;">yes</div>
+        </div>
+        <div style="display: grid; grid-template-columns: 150px 1fr 130px;">
+          <div style="padding: 11px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #14121F;">failed</div>
+          <div style="padding: 11px 16px; font-size: 14px; color: #3A3550;">Terminated abnormally; observed only</div>
+          <div style="padding: 11px 16px; font-size: 13.5px; color: #C4342E; font-weight: 600;">no</div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 14px; margin-top: 16px;">
+        <div style="flex-grow: 1; border: 1px solid #E8E5F2; border-radius: 12px; padding: 14px 18px; display: flex; flex-direction: column; gap: 4px;">
+          <span style="font-size: 12px; color: #A9A4BE;">Previous</span>
+          <span style="font-size: 14.5px; font-weight: 600; color: #5F3DF2;">Neurons &amp; processes</span>
+        </div>
+        <div style="flex-grow: 1; border: 1px solid #E8E5F2; border-radius: 12px; padding: 14px 18px; display: flex; flex-direction: column; gap: 4px; align-items: flex-end;">
+          <span style="font-size: 12px; color: #A9A4BE;">Next</span>
+          <span style="font-size: 14.5px; font-weight: 600; color: #5F3DF2;">Execution states</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOC -->
+    <div style="padding: 26px 40px 44px 16px; display: flex; flex-direction: column; gap: 11px;">
+      <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.09em; color: #A9A4BE;">ON THIS PAGE</div>
+      <div style="font-size: 12.5px; color: #5F3DF2; font-weight: 600; border-left: 2px solid #5F3DF2; padding-left: 10px; margin-left: -1px;">The loop</div>
+      <div style="font-size: 12.5px; color: #7C7793; padding-left: 10px;">Token idempotency</div>
+      <div style="font-size: 12.5px; color: #7C7793; padding-left: 20px;">Applying a command</div>
+      <div style="font-size: 12.5px; color: #7C7793; padding-left: 10px;">Execution states</div>
+      <div style="height: 1px; background: #EEECF5; margin: 6px 0;"></div>
+      <div style="display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: #7C7793;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#A9A4BE" stroke-width="1.8"><path d="M11 4H5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2v-6"></path><path d="M18.4 2.6a2 2 0 0 1 2.8 2.8L12 14.6 8 15.6l1-4Z"></path></svg>Edit this page</div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

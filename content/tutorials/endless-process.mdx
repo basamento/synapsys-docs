@@ -1,0 +1,83 @@
+---
+title: 2. An endless process
+description: Add a process that runs until told to stop, and stop it cleanly.
+sidebar_position: 2
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# 2. An endless process
+
+A worker with no processes is just a heartbeat. Now we add something startable.
+
+## Declare it
+
+<Tabs groupId="connection">
+<TabItem value="spring-boot" label="Spring Boot">
+
+```java
+@SynapsysProcess(name = "ticker", type = ENDLESS)
+public class Ticker extends AbstractSynapsysProcess {
+
+    @Override
+    public void run(StopSignal stop) {
+        while (!stop.requested()) {
+            log.info("tick");
+            stop.sleep(Duration.ofSeconds(2));
+        }
+        log.info("stopped cleanly");
+    }
+}
+```
+
+`stop.sleep` is not `Thread.sleep` — it returns early when a stop arrives, so a
+process with a long interval still stops promptly.
+
+</TabItem>
+<TabItem value="raw-api" label="Raw API">
+
+Declare it by including it in the batch:
+
+```json
+{
+  "workerName": "hello-worker",
+  "framework": "curl",
+  "host": "laptop",
+  "heartbeatInterval": 5,
+  "processes": [
+    { "name": "ticker", "type": "endless", "currentState": "idle", "ackToken": 0 }
+  ]
+}
+```
+
+The Core creates the process on first sight. Your loop must now read the response
+and act on it — see [applying commands](/manuals/raw-api/the-heartbeat-loop).
+
+</TabItem>
+</Tabs>
+
+## Start it
+
+Restart, open the console, find `ticker` under your worker in state `idle`, and
+press **Start**.
+
+Within one interval the state becomes `running` and the logs start ticking.
+
+## Stop it
+
+Press **Stop**. Watch the state closely — it becomes `stopping` first, and only
+becomes `idle` once your loop has actually returned.
+
+That intermediate state is real, not cosmetic. It means the Core has asked and is
+waiting. A process that ignores the stop signal stays in `stopping` forever, which
+is exactly the signal you want.
+
+## Try breaking it
+
+Press **Stop** twice quickly. The process stops once.
+
+The second press increments `desiredToken` again, but by the time your worker sees
+it the process is already stopping and the applied token has moved past it. This
+is the token comparison doing its job — see
+[the heartbeat protocol](/docs/concepts/heartbeat-protocol).

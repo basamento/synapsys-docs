@@ -1,0 +1,193 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; font-family: "Plus Jakarta Sans", system-ui, sans-serif; }
+    a { color: #5F3DF2; } a:hover { color: #4A2BD0; }
+  </style>
+</helmet>
+
+<div style="width: 1320px; background: #FFFFFF; color: #14121F; padding: 40px 44px 48px; box-sizing: border-box; display: flex; flex-direction: column; gap: 26px;">
+
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.14em; color: #A9A4BE;">SYNAPSYS DOCS &middot; MOBILE</div>
+    <div style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 32px; font-weight: 700; letter-spacing: -0.03em;">What Docusaurus does not decide for you</div>
+    <p style="margin: 0; font-size: 14.5px; line-height: 1.6; color: #5F5A78; max-width: 88ch;">Below 996px the sidebar becomes a drawer, the table of contents hides and the content takes the full width &mdash; all for free. These three states are the ones that are not: where the version selector goes once the sidebar is a drawer, and what happens to content that is wider than the screen.</p>
+  </div>
+
+  <div style="height: 1px; background: #EEECF5;"></div>
+
+  <div style="display: flex; gap: 26px; align-items: flex-start;">
+
+    <!-- ============ 1. CLOSED ============ -->
+    <div style="display: flex; flex-direction: column; gap: 12px; width: 390px; flex-shrink: 0;">
+      <div style="display: flex; flex-direction: column; gap: 3px;">
+        <div style="font-size: 14px; font-weight: 700;">1 &middot; Closed</div>
+        <div style="font-size: 12.5px; color: #7C7793; line-height: 1.5;">Breadcrumb replaced by a back link. TOC becomes a collapsed row above the title, not a sidebar.</div>
+      </div>
+
+      <div style="border: 1px solid #E8E5F2; border-radius: 16px; overflow: hidden;">
+        <div style="background: #17123A; padding: 0 12px 0 16px; display: flex; align-items: center; justify-content: space-between; height: 56px;">
+          <div style="display: flex; align-items: center; gap: 9px;">
+            <svg width="24" height="24" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="22" fill="#5F3DF2"></circle><path d="M24 24 24 9M24 24 36.99 31.5M24 24 11.01 31.5" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"></path><circle cx="24" cy="24" r="6" fill="#FFFFFF"></circle><circle cx="24" cy="9" r="4" fill="#12B5A0"></circle><circle cx="36.99" cy="31.5" r="4" fill="#12B5A0"></circle><circle cx="11.01" cy="31.5" r="4" fill="#12B5A0"></circle></svg>
+            <span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 17px; color: #FFFFFF; letter-spacing: -0.025em;">Synapsys</span>
+          </div>
+          <div style="display: flex; align-items: center;">
+            <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C7C1E4" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg></div>
+            <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"></path></svg></div>
+          </div>
+        </div>
+
+        <div style="padding: 12px 16px 26px; display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; align-items: center; gap: 7px; height: 44px; font-size: 13.5px; color: #5F3DF2; font-weight: 600;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#5F3DF2" stroke-width="2.4"><path d="m15 6-6 6 6 6"></path></svg>Concepts
+          </div>
+
+          <div style="border: 1px solid #E8E5F2; border-radius: 10px; padding: 0 14px; height: 48px; display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 13.5px; font-weight: 600; color: #5F5A78;">On this page</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A9A4BE" stroke-width="2.6"><path d="m6 9 6 6 6-6"></path></svg>
+          </div>
+
+          <div style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 30px; font-weight: 700; letter-spacing: -0.032em; line-height: 1.1;">Heartbeat protocol</div>
+          <p style="margin: 0; font-size: 15.5px; line-height: 1.62; color: #3A3550; text-wrap: pretty;">A worker holds no open port. Every few seconds it posts the state of each process it owns, and the Core replies with what it wants those processes to be doing.</p>
+          <div style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 21px; font-weight: 600; letter-spacing: -0.024em; margin-top: 4px;">The loop</div>
+          <p style="margin: 0; font-size: 15px; line-height: 1.68; color: #3A3550; text-wrap: pretty;">There is exactly one endpoint. The worker sends every process it knows about in a single batch.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 2. DRAWER ============ -->
+    <div style="display: flex; flex-direction: column; gap: 12px; width: 390px; flex-shrink: 0;">
+      <div style="display: flex; flex-direction: column; gap: 3px;">
+        <div style="font-size: 14px; font-weight: 700;">2 &middot; Drawer open</div>
+        <div style="font-size: 12.5px; color: #7C7793; line-height: 1.5;">The version selector pins to the top and does not scroll away. It is how someone on a phone finds out they are reading old docs.</div>
+      </div>
+
+      <div style="border: 1px solid #E8E5F2; border-radius: 16px; overflow: hidden; background: #FFFFFF;">
+        <div style="background: #17123A; padding: 0 12px 0 16px; display: flex; align-items: center; justify-content: space-between; height: 56px;">
+          <div style="display: flex; align-items: center; gap: 9px;">
+            <svg width="24" height="24" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="22" fill="#5F3DF2"></circle><path d="M24 24 24 9M24 24 36.99 31.5M24 24 11.01 31.5" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"></path><circle cx="24" cy="24" r="6" fill="#FFFFFF"></circle><circle cx="24" cy="9" r="4" fill="#12B5A0"></circle><circle cx="36.99" cy="31.5" r="4" fill="#12B5A0"></circle><circle cx="11.01" cy="31.5" r="4" fill="#12B5A0"></circle></svg>
+            <span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 17px; color: #FFFFFF; letter-spacing: -0.025em;">Synapsys</span>
+          </div>
+          <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"></path></svg></div>
+        </div>
+
+        <div style="padding: 14px 16px 10px; border-bottom: 1px solid #EEECF5; background: #FAFAFC;">
+          <div style="display: flex; align-items: center; justify-content: space-between; background: #F2EFFF; border: 1px solid #D9CFFF; border-radius: 10px; padding: 0 14px; height: 52px;">
+            <div style="display: flex; flex-direction: column; gap: 1px;">
+              <span style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.07em; color: #7C5CFF;">CORE</span>
+              <span style="font-size: 14px; font-weight: 600;">v2.1 &middot; latest</span>
+            </div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5F3DF2" stroke-width="2.6"><path d="m6 9 6 6 6-6"></path></svg>
+          </div>
+        </div>
+
+        <div style="padding: 10px 10px 22px; display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; flex-direction: column; gap: 2px;">
+            <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.09em; color: #A9A4BE; padding: 8px 12px 4px;">CONCEPTS</div>
+            <div style="font-size: 14.5px; color: #5F5A78; height: 46px; display: flex; align-items: center; padding: 0 12px; border-radius: 9px;">Architecture</div>
+            <div style="font-size: 14.5px; color: #5F5A78; height: 46px; display: flex; align-items: center; padding: 0 12px; border-radius: 9px;">Neurons &amp; processes</div>
+            <div style="font-size: 14.5px; color: #5F3DF2; font-weight: 600; background: #F2EFFF; height: 46px; display: flex; align-items: center; padding: 0 12px; border-radius: 9px;">Heartbeat protocol</div>
+            <div style="font-size: 14.5px; color: #5F5A78; height: 46px; display: flex; align-items: center; padding: 0 12px; border-radius: 9px;">Execution states</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 2px;">
+            <div style="font-size: 11px; font-weight: 700; letter-spacing: 0.09em; color: #A9A4BE; padding: 8px 12px 4px;">MANUALS</div>
+            <div style="font-size: 14.5px; color: #5F5A78; height: 46px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px;">Core<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#A9A4BE" stroke-width="2.4"><path d="m9 6 6 6-6 6"></path></svg></div>
+            <div style="font-size: 14.5px; color: #5F5A78; height: 46px; display: flex; align-items: center; justify-content: space-between; padding: 0 12px;">Spring Boot starter<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#A9A4BE" stroke-width="2.4"><path d="m9 6 6 6-6 6"></path></svg></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 3. OVERFLOW ============ -->
+    <div style="display: flex; flex-direction: column; gap: 12px; width: 390px; flex-shrink: 0;">
+      <div style="display: flex; flex-direction: column; gap: 3px;">
+        <div style="font-size: 14px; font-weight: 700;">3 &middot; Content wider than the screen</div>
+        <div style="font-size: 12.5px; color: #7C7793; line-height: 1.5;">Code and tables scroll inside their own box. The page body never scrolls sideways &mdash; a fade marks the edge so the scroll is discoverable.</div>
+      </div>
+
+      <div style="border: 1px solid #E8E5F2; border-radius: 16px; overflow: hidden; padding: 18px 0 24px;">
+
+        <div style="padding: 0 16px 10px; font-size: 12.5px; font-weight: 700; color: #5F5A78;">Code block &mdash; tab row scrolls too</div>
+        <div style="margin: 0 16px; border-radius: 12px; overflow: hidden; background: #17123A; position: relative;">
+          <div style="display: flex; padding: 6px 6px 0; gap: 3px;">
+            <div style="padding: 0 13px; height: 40px; display: flex; align-items: center; color: #FFFFFF; font-size: 12.5px; font-weight: 600; background: #251E52; border-radius: 8px; flex-shrink: 0;">Request</div>
+            <div style="padding: 0 13px; height: 40px; display: flex; align-items: center; color: #8C85B4; font-size: 12.5px; font-weight: 500; flex-shrink: 0;">Response</div>
+            <div style="padding: 0 13px; height: 40px; display: flex; align-items: center; color: #8C85B4; font-size: 12.5px; font-weight: 500; flex-shrink: 0;">cur</div>
+          </div>
+          <div style="padding: 10px 14px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; line-height: 1.75; color: #D6D2EA; white-space: nowrap; overflow: hidden;">
+            <div><span style="color: #E0A63C;">POST</span> /api/v1/workers/heartbeat</div>
+            <div>{</div>
+            <div>&nbsp;&nbsp;<span style="color: #A98CFF;">"workerName"</span>: <span style="color: #12B5A0;">"billing-jobs"</span>,</div>
+            <div>&nbsp;&nbsp;<span style="color: #A98CFF;">"heartbeatInterval"</span>: <span style="color: #12B5A0;">5</span>,</div>
+            <div>&nbsp;&nbsp;<span style="color: #A98CFF;">"processes"</span>: [{ <span style="color: #A98CFF;">"name"</span>: <span style="color: #12B5A0;">"nig</span></div>
+            <div>}</div>
+          </div>
+          <div style="position: absolute; top: 46px; right: 0; bottom: 0; width: 34px; background: linear-gradient(to right, rgba(23,18,58,0), #17123A);"></div>
+        </div>
+
+        <div style="padding: 22px 16px 10px; font-size: 12.5px; font-weight: 700; color: #5F5A78;">Table &mdash; same treatment</div>
+        <div style="margin: 0 16px; border: 1px solid #E8E5F2; border-radius: 10px; overflow: hidden; position: relative;">
+          <div style="display: grid; grid-template-columns: 120px 1fr 130px; background: #FAFAFC; border-bottom: 1px solid #E8E5F2; width: 380px;">
+            <div style="padding: 10px 14px; font-size: 12px; font-weight: 700; color: #5F5A78;">State</div>
+            <div style="padding: 10px 14px; font-size: 12px; font-weight: 700; color: #5F5A78;">Meaning</div>
+            <div style="padding: 10px 14px; font-size: 12px; font-weight: 700; color: #5F5A78;">Cmd</div>
+          </div>
+          <div style="display: grid; grid-template-columns: 120px 1fr 130px; border-bottom: 1px solid #EEECF5; width: 380px;">
+            <div style="padding: 11px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">idle</div>
+            <div style="padding: 11px 14px; font-size: 13.5px; color: #3A3550; white-space: nowrap;">Not running; no comm</div>
+            <div style="padding: 11px 14px; font-size: 13px; color: #0E9F8C; font-weight: 600;">yes</div>
+          </div>
+          <div style="display: grid; grid-template-columns: 120px 1fr 130px; border-bottom: 1px solid #EEECF5; width: 380px;">
+            <div style="padding: 11px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">running</div>
+            <div style="padding: 11px 14px; font-size: 13.5px; color: #3A3550; white-space: nowrap;">Executing now</div>
+            <div style="padding: 11px 14px; font-size: 13px; color: #0E9F8C; font-weight: 600;">yes</div>
+          </div>
+          <div style="display: grid; grid-template-columns: 120px 1fr 130px; width: 380px;">
+            <div style="padding: 11px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;">failed</div>
+            <div style="padding: 11px 14px; font-size: 13.5px; color: #3A3550; white-space: nowrap;">Terminated abnormal</div>
+            <div style="padding: 11px 14px; font-size: 13px; color: #C4342E; font-weight: 600;">no</div>
+          </div>
+          <div style="position: absolute; top: 0; right: 0; bottom: 0; width: 30px; background: linear-gradient(to right, rgba(255,255,255,0), #FFFFFF);"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height: 1px; background: #EEECF5;"></div>
+
+  <!-- RULES -->
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px;">
+    <div style="border: 1px solid #E8E5F2; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 7px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: 0.13em; color: #A9A4BE;">BREAKPOINTS</div>
+      <div style="font-size: 13.5px; line-height: 1.6; color: #3A3550;"><code style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; background: #F4F2FA; padding: 1px 5px; border-radius: 4px;">996px</code> &mdash; Docusaurus&rsquo;s own. Sidebar becomes a drawer, TOC hides. Do not invent a different one for the docs shell.</div>
+      <div style="font-size: 13.5px; line-height: 1.6; color: #3A3550;"><code style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; background: #F4F2FA; padding: 1px 5px; border-radius: 4px;">640px</code> &mdash; the landing page&rsquo;s own. Grids collapse to one column, buttons go full width.</div>
+    </div>
+    <div style="border: 1px solid #E8E5F2; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 7px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: 0.13em; color: #A9A4BE;">TAP TARGETS</div>
+      <div style="font-size: 13.5px; line-height: 1.6; color: #3A3550;">Anything tappable is at least <code style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; background: #F4F2FA; padding: 1px 5px; border-radius: 4px;">44px</code> tall below 996px &mdash; sidebar rows, navbar icons, footer links, tabs.</div>
+      <div style="font-size: 13.5px; line-height: 1.6; color: #5F5A78;">The desktop boards use 30px rows. That is fine with a mouse and fails on a phone, so <code style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; background: #F4F2FA; padding: 1px 5px; border-radius: 4px;">tokens.css</code> raises them at the breakpoint rather than making desktop loose.</div>
+    </div>
+    <div style="border: 1px solid #E8E5F2; border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 7px;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: 0.13em; color: #A9A4BE;">OVERFLOW</div>
+      <div style="font-size: 13.5px; line-height: 1.6; color: #3A3550;">Wide content scrolls inside its own container. The page body never scrolls sideways.</div>
+      <div style="font-size: 13.5px; line-height: 1.6; color: #5F5A78;">Infima does not do this for tables &mdash; a wide table will push the whole page. The rule in <code style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; background: #F4F2FA; padding: 1px 5px; border-radius: 4px;">tokens.css</code> is what stops it.</div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
