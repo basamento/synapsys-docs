@@ -65,6 +65,14 @@
   padding-right: 0;
 }
 
+/* The docs main container already owns its horizontal gutters. Infima's row
+   compensation would otherwise pull the content 16px into the sidebar and
+   extend the right rail beyond the viewport. */
+[class*='docMainContainer'] .row {
+  margin-left: 0;
+  margin-right: 0;
+}
+
 .theme-doc-markdown {
   max-width: 780px;
   /* No padding here — docItemCol already provides it, and padding on both
@@ -81,6 +89,7 @@
   [class*='docItemCol'] {
     padding: var(--syn-space-4) var(--syn-space-4) var(--syn-space-8);
   }
+
 }
 
 /* TOC rail */
@@ -211,7 +220,11 @@ div[class^='codeBlockTitle'] {
 
 .navbar__toggle,
 .navbar__search-input {
-  color: var(--syn-text-secondary);
+  color: var(--syn-text-on-dark);
+}
+
+[class*='colorModeToggle'] button {
+  color: var(--syn-text-on-dark);
 }
 
 /* The dropdown menu itself is a normal light/dark surface, not part of the band. */

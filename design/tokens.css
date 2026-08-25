@@ -39,6 +39,11 @@
   --syn-red-on-light:   #C4342E;
   --syn-red-on-dark:    #F0736C;
 
+  /* Text used on the permanent dark hero/CTA surfaces, independent of the
+     page's selected light/dark mode. */
+  --syn-text-on-dark:   #B5AED6;
+  --syn-text-muted-on-dark: #8C85B4;
+
   /* --- type ---------------------------------------------------------------- */
   --syn-font-display: "Bricolage Grotesque", "Plus Jakarta Sans", system-ui, sans-serif;
   --syn-font-body:    "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
@@ -289,14 +294,27 @@
    ========================================================================== */
 
 @media (max-width: 996px) {
+  /* Keep the theme control available beside the compact navbar. */
+  [class*='colorModeToggle'] {
+    display: flex;
+  }
+
   .menu__link,
-  .navbar__item,
-  .navbar__link,
   .theme-doc-sidebar-item-link a,
   .theme-doc-sidebar-item-category > div > a,
   .pagination-nav__link,
   .footer__link-item,
   .tabs__item {
+    min-height: var(--syn-tap-min);
+    display: flex;
+    align-items: center;
+  }
+
+  /* Docusaurus hides the desktop navbar items at this breakpoint. Scope the
+     touch sizing to the drawer so it does not make those desktop links visible
+     again on a phone. */
+  .navbar-sidebar .navbar__item,
+  .navbar-sidebar .navbar__link {
     min-height: var(--syn-tap-min);
     display: flex;
     align-items: center;

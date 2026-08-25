@@ -152,7 +152,9 @@ const config: Config = {
 
     colorMode: {
       defaultMode: 'light',
-      respectPrefersColorScheme: true,
+      // Keep the control a predictable light/dark toggle. A third "system"
+      // state made clicks appear to do nothing whenever the OS was dark.
+      respectPrefersColorScheme: false,
     },
 
     navbar: {

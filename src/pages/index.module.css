@@ -59,7 +59,7 @@
   margin: 0;
   font-size: 1.06rem;
   line-height: 1.6;
-  color: var(--syn-text-secondary);
+  color: var(--syn-text-on-dark);
   max-width: 48ch;
   text-wrap: pretty;
 }
@@ -127,7 +127,7 @@
   justify-content: space-between;
   font-size: 0.72rem;
   font-weight: 600;
-  color: #8c85b4;
+  color: var(--syn-text-muted-on-dark);
   letter-spacing: 0.07em;
 }
 
@@ -164,7 +164,7 @@
 .rowName span {
   font-family: var(--syn-font-mono);
   font-size: 0.66rem;
-  color: #8c85b4;
+  color: var(--syn-text-muted-on-dark);
 }
 
 .pill {
@@ -417,7 +417,7 @@
   margin: 0;
   font-size: 0.94rem;
   line-height: 1.6;
-  color: var(--syn-text-secondary);
+  color: var(--syn-text-on-dark);
   max-width: 52ch;
 }
 
