@@ -1,7 +1,7 @@
 import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
 
 const sidebars: SidebarsConfig = {
-  reference: ['glossary', 'state-machine'],
+  reference: ['http-api', 'glossary', 'state-machine'],
 };
 
 export default sidebars;

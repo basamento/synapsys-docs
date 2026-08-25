@@ -18,8 +18,8 @@ to work through and then test against.
       records `unknown` — it never guesses `springboot` or anything else.
 - [ ] Send a `host`. If you omit it the Core falls back to the TCP remote address,
       which is usually a container IP and usually useless.
-- [ ] Send `heartbeatInterval` as an **integer number of seconds**, matching the
-      interval you actually use.
+- [ ] Send `heartbeatInterval` as a **positive integer number of seconds**,
+      matching the interval you actually use.
 
 ## The loop
 
@@ -38,7 +38,8 @@ to work through and then test against.
       that process.
 - [ ] Apply the command **only** when `desiredToken > ackToken`. Equal or lower is
       a duplicate and must be ignored.
-- [ ] Set `ackToken = desiredToken` **after** applying, not before.
+- [ ] Set `ackToken = desiredToken` **after your local command handler accepts
+      the command**, not before.
 - [ ] Report the new `ackToken` on the next beat.
 - [ ] Treat `desiredState: "idle"` as **no command**. It is not a stop.
 - [ ] Reject `failed` as a desired state — it is observable only.

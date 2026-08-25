@@ -37,7 +37,7 @@ Content-Type: application/json
 | `workerName` | string | Stable across restarts. This is your identity. |
 | `framework` | string | Your runtime. Omit it and the Core records `unknown` — it never guesses. |
 | `host` | string | Omit it and the Core falls back to the TCP remote address, usually a container IP. |
-| `heartbeatInterval` | integer | **Seconds.** Match the interval you actually use. |
+| `heartbeatInterval` | integer | **Positive whole seconds.** Match the interval you actually use. |
 | `processes[].name` | string | Unique within this worker, not globally. |
 | `processes[].type` | string | `endless` or `progressive`. |
 | `processes[].currentState` | string | `idle`, `running`, `stopping` or `failed`. |
@@ -77,8 +77,9 @@ Three rules that clients get wrong:
 
 1. **`desiredState: "idle"` is not a stop.** It means there is no outstanding
    command. Stop is `stopping`.
-2. **Update `ackToken` after applying, not before.** If you update first and then
-   crash, the command is lost — the Core will consider it acknowledged.
+2. **Update `ackToken` after the local handler accepts the command, not before.**
+   If you update first and then the handler fails, the command is lost — the Core
+   will consider it acknowledged.
 3. **Equal tokens are duplicates.** Only strictly greater means "new".
 
 ## Failure handling

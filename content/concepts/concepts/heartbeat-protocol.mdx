@@ -74,7 +74,7 @@ Response:
 }
 ```
 
-`heartbeatInterval` is in **seconds**, as an integer.
+`heartbeatInterval` is in **positive whole seconds**, as an integer.
 
 </TabItem>
 </Tabs>
@@ -96,9 +96,10 @@ if (desiredToken > ackToken) {
 }
 ```
 
-The worker reports its `ackToken` on the next heartbeat. Once the Core sees
-`ackToken >= desiredToken` it clears the command, resetting `desiredState` back
-to `idle`.
+The worker reports its `ackToken` on the next heartbeat. Core clears an
+acknowledged start immediately. It clears an acknowledged stop after the worker
+also reports a terminal state (`idle` or `failed`). In both cases it resets
+`desiredState` to `idle`.
 
 :::caution
 A `desiredState` of `idle` means **"no command"**, never "stop". Stop is
@@ -115,7 +116,8 @@ process it owns on the first heartbeat after a command completes.
 | Reports `ackToken` | yes | — |
 | Issues `desiredState` | — | yes |
 | Increments `desiredToken` | — | on each user command |
-| Clears a completed command | — | once `ackToken >= desiredToken` |
+| Clears a completed start | — | once `ackToken >= desiredToken` |
+| Clears a completed stop | — | once acknowledged and terminal |
 
 ## One bad process does not fail the batch
 

@@ -36,10 +36,12 @@ sidebar_position: 2
 | 3 | Worker | Reads response, sees `desiredToken > ackToken` |
 | 4 | Worker | Applies command, sets `ackToken = desiredToken` |
 | 5 | Worker | Reports new `ackToken` on next heartbeat |
-| 6 | Core | Sees `ackToken >= desiredToken`, resets `desiredState` to `idle`, clears `runId` |
+| 6 | Core | Clears an acknowledged start, or an acknowledged stop once the process is terminal; resets `desiredState` to `idle` |
+| 7 | Core | Keeps `runId` while the execution is active; closes and retains the execution when the worker reports `idle` or `failed` |
 
-Step 6 only clears the processes whose command actually completed — a sibling
-process with a start still in flight keeps its run id.
+Command completion and execution completion are different. A start command is
+complete once accepted, while its execution and `runId` remain active until the
+process finishes or stops.
 
 ## Invariants
 

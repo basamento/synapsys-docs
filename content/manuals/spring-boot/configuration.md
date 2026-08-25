@@ -25,7 +25,7 @@ expensive to find than a failed boot with the bad key named in the error.
 | `synapsys.core-url` | String | — | **Required.** Base URL of the Core, no trailing slash. |
 | `synapsys.worker-name` | String | `spring.application.name` | Must be stable across restarts — it is how the Core recognises a returning worker. |
 | `synapsys.host` | String | machine hostname | Set it explicitly when the resolved name is meaningless, as with a container id. |
-| `synapsys.heartbeat-interval` | Duration | `5s` | Duration syntax: `5s`, `500ms`, `1m`. |
+| `synapsys.heartbeat-interval` | Duration | `5s` | Positive whole seconds: `1s`, `5s`, `1m`. |
 | `synapsys.fail-fast` | boolean | `false` | Whether an unreachable Core at startup stops the application. |
 | `synapsys.connect-timeout` | Duration | `2s` | Connect timeout for the heartbeat call. |
 | `synapsys.request-timeout` | Duration | `5s` | Read timeout for the heartbeat call. |
@@ -55,6 +55,9 @@ up. Five seconds is a reasonable default for background jobs.
 Lowering it makes the console feel more responsive and costs one HTTP request per
 worker per interval. Raising it beyond about thirty seconds makes the console feel
 broken, because a button press appears to do nothing for half a minute.
+
+The v1 wire protocol represents this value as an integer number of seconds, so
+sub-second durations are rejected at startup.
 
 ## `fail-fast`
 

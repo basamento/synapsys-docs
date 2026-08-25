@@ -40,7 +40,8 @@ Cancelled by interruption rather than by a flag.
 
 ### Execution
 
-One run of a process, with a start, an end and an outcome.
+One durable run of a process, with a start, an end and an outcome. Starting a
+process appends a new execution record; completed executions remain in history.
 
 ### Run id
 

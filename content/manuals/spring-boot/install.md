@@ -50,8 +50,9 @@ to add to your application class.
 
 ## Requirements
 
-- **Java 21.** The project targets 21; building on 25 fails with a Lombok error
-  (`ExceptionInInitializerError: com.sun.tools.javac.code.TypeTag :: UNKNOWN`).
+- **Java 17 or later.** The starter targets Java 17. The bundled example and
+  workspace development scripts use Java 21; its Lombok version is not currently
+  compatible with JDK 25.
 - Spring Boot 3.x.
 
 Next: [configuration](./configuration).

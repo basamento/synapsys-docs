@@ -109,7 +109,7 @@ client must do, in order, with nothing else on the page.
 
 ### Reference — `/reference`
 
-- `http-api` — Generated from the OpenAPI spec. Not hand-written.
+- `http-api` — Entry point to the OpenAPI-backed HTTP contract.
 - `heartbeat-payload` — The request and response objects, field by field
 - `glossary` — Neuron, process, execution, action, run, token
 - `state-machine` — The full state table, in one place, linkable
@@ -186,10 +186,10 @@ present-and-empty, and not marked "coming soon" (see conventions).
 - **Does `/docs/start` belong inside the concepts instance or its own?** Currently
   planned as a category inside `concepts`. Its own instance only if it ever needs
   independent versioning, which is unlikely.
-- **The OpenAPI spec does not exist yet**, and Raw API being a first-class
-  connection method raises its priority sharply: `reference/http-api` is now one
-  of four supported integration paths rather than a secondary surface. It has to
-  be written in `synapsys-core-go` against the real handlers.
+- **OpenAPI publication**: the source specification now lives in
+  `synapsys-core-go/openapi.yaml`. The remaining release task is to publish a
+  rendered reference from it without introducing a second hand-maintained
+  contract.
 - **Which starters actually follow Spring Boot.** The connection methods are
   currently Spring Boot, Go, Python and Raw API; Node and .NET were dropped from
   the earlier plan. Each one that lands adds one `/manuals/` instance.
