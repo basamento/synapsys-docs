@@ -1,0 +1,40 @@
+name: Deploy documentation
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: synapsys-docs-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, linux, synapsys-docs]
+
+    steps:
+      - name: Check out the deployed revision
+        uses: actions/checkout@v4
+
+      - name: Build and restart documentation
+        run: docker compose -f compose.yml up -d --build --remove-orphans
+
+      - name: Wait for the container health check
+        shell: bash
+        run: |
+          for attempt in {1..30}; do
+            status="$(docker inspect --format '{{.State.Health.Status}}' synapsys-docs-docs-1 2>/dev/null || true)"
+            if [ "$status" = "healthy" ]; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker compose -f compose.yml ps
+          docker logs synapsys-docs-docs-1
+          exit 1
+
