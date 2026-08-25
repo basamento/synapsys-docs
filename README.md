@@ -10,7 +10,7 @@ npm install
 npm run start
 ```
 
-The dev server comes up at <http://localhost:3000/synapsys-docs/>.
+The dev server comes up at <http://localhost:3000/>.
 
 ```bash
 npm run build      # production build into build/

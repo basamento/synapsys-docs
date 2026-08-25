@@ -20,9 +20,8 @@ const config: Config = {
   tagline: 'Bring every scattered script under one roof',
   favicon: 'img/favicon.svg',
 
-  // TODO: point at the custom domain once one exists.
-  url: `https://${GITHUB_ORG}.github.io`,
-  baseUrl: '/synapsys-docs/',
+  url: 'https://docs.synapsys.jmzworks.it',
+  baseUrl: '/',
   organizationName: GITHUB_ORG,
   projectName: 'synapsys-docs',
   trailingSlash: false,
