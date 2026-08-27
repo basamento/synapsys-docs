@@ -9,21 +9,22 @@ sidebar_position: 1
 The Core is one Go binary with the React console compiled into it via `go:embed`.
 One artifact, one port, one file of state.
 
-:::info Not published yet
-No public image, no tagged release. Built from source until then.
+:::info Early development image
+The Core image is private and pre-1.0. Authenticate to GitHub Container Registry
+and use an explicit version tag such as `0.1.0` or `0.1.0-alpha.1`.
 :::
 
 ## Docker
 
 ```bash
-git clone https://github.com/JMarzoli/synapsys-core-go.git
-cd synapsys-core-go
-docker build -t synapsys-core .
-docker run -p 8080:8080 -v synapsys-data:/app/data synapsys-core
+docker login ghcr.io
+docker pull ghcr.io/jmarzoli/synapsys-core:0.1.0
+docker run -p 8080:8080 -v synapsys-data:/app/data ghcr.io/jmarzoli/synapsys-core:0.1.0
 ```
 
-The build is multi-stage: Node builds the frontend, Go embeds it and compiles a
-static binary, and the runtime image is Alpine with just that binary.
+The image is built through a multi-stage workflow: Node builds the frontend, Go
+embeds it and compiles a static binary, and the runtime image is Alpine with just
+that binary.
 
 ## What it needs
 

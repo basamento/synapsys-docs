@@ -187,7 +187,7 @@ present-and-empty, and not marked "coming soon" (see conventions).
   planned as a category inside `concepts`. Its own instance only if it ever needs
   independent versioning, which is unlikely.
 - **OpenAPI publication**: the source specification now lives in
-  `synapsys-core-go/openapi.yaml`. The remaining release task is to publish a
+  `synapsys-core/openapi.yaml`. The remaining release task is to publish a
   rendered reference from it without introducing a second hand-maintained
   contract.
 - **Which starters actually follow Spring Boot.** The connection methods are

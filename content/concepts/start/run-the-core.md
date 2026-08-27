@@ -9,21 +9,20 @@ sidebar_position: 2
 The Core ships as a single Go binary with its web console compiled into it. There
 is no separate frontend to deploy and no external database to provision.
 
-:::info Not published yet
-There is no image on a public registry and no tagged release. Until there is, the
-Core is built from source. This page will change when that lands.
+:::info Early development image
+The Core image is private and pre-1.0. Authenticate to GitHub Container Registry
+and use an explicit version tag such as `0.1.0` or `0.1.0-alpha.1`.
 :::
 
 ## With Docker
 
 ```bash
-git clone https://github.com/JMarzoli/synapsys-core-go.git
-cd synapsys-core-go
-docker build -t synapsys-core .
+docker login ghcr.io
+docker pull ghcr.io/jmarzoli/synapsys-core:0.1.0
 ```
 
 ```bash
-docker run -p 8080:8080 -v synapsys-data:/app/data synapsys-core
+docker run -p 8080:8080 -v synapsys-data:/app/data ghcr.io/jmarzoli/synapsys-core:0.1.0
 ```
 
 The console is now at **http://localhost:8080**.

@@ -129,7 +129,7 @@ files — extract it back before making further local edits.
 
 - **Information architecture** — the actual page list. Sidebar shape and
   versioning boundaries fall out of it.
-- **OpenAPI spec** for the heartbeat contract, in `synapsys-core-go`.
+- **OpenAPI spec** for the heartbeat contract, in `synapsys-core`.
   Prerequisite for a generated API reference.
 - **Invented content in the mockups** — worker names, process counts and the
   `v2.1` version number are stand-ins. The 5s heartbeat is the real default.

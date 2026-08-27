@@ -1,6 +1,6 @@
 # synapsys-docs
 
-The documentation website for the [Synapsys](https://github.com/JMarzoli/synapsys-core-go)
+The documentation website for the [Synapsys](https://github.com/JMarzoli/synapsys-core)
 ecosystem. Built with [Docusaurus 3](https://docusaurus.io/).
 
 ## Run it

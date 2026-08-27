@@ -179,7 +179,7 @@ const config: Config = {
         { to: '/reference/glossary', label: 'Reference', position: 'left' },
         { to: '/blog', label: 'Blog', position: 'left' },
         {
-          href: `https://github.com/${GITHUB_ORG}/synapsys-core-go`,
+          href: `https://github.com/${GITHUB_ORG}/synapsys-core`,
           label: 'GitHub',
           position: 'right',
         },
@@ -213,7 +213,7 @@ const config: Config = {
         {
           title: 'Project',
           items: [
-            { label: 'Core', href: `https://github.com/${GITHUB_ORG}/synapsys-core-go` },
+            { label: 'Core', href: `https://github.com/${GITHUB_ORG}/synapsys-core` },
             { label: 'Spring Boot starter', href: `https://github.com/${GITHUB_ORG}/synapsys-springboot-starter` },
             { label: 'Blog', to: '/blog' },
           ],

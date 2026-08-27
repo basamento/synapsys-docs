@@ -7,7 +7,7 @@ sidebar_position: 1
 # HTTP API
 
 The canonical HTTP contract is the
-[OpenAPI 3.1 specification](https://github.com/JMarzoli/synapsys-core-go/blob/main/openapi.yaml)
+[OpenAPI 3.1 specification](https://github.com/JMarzoli/synapsys-core/blob/main/openapi.yaml)
 in the Core repository. Client libraries, examples, and this documentation must
 all follow that file.
 
