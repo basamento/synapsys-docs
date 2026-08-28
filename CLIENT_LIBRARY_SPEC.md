@@ -34,9 +34,15 @@ including an old one nobody wants to touch.**
 
 This outranks elegance, feature completeness, and internal purity. Concretely:
 
-- **Add the dependency, set two config values, run.** No mandatory initialisation
-  call, no builder, no manual wiring of a client object, no code change at the
-  application's entry point.
+- **Add the dependency, set two config values, run.** No initialisation call where
+  the framework provides a lifecycle to hook; exactly one otherwise. No builder, no
+  manual wiring of a client object, and no code change beyond the entry point.
+
+  Spring, Nest and Fastify all expose a lifecycle, so those integrations start
+  themselves and cost the user nothing. Plain Node, Go and Python have nothing to
+  hook, and a single explicit `start()` is the honest minimum there — inventing an
+  import side effect to avoid it would be worse, because it cannot be disabled,
+  ordered, or removed.
 - **Declaring a process is the only code a user writes.** One annotation,
   decorator, interface, or registration call — whichever is idiomatic — plus a
   method body they already had.
@@ -66,7 +72,7 @@ each ecosystem's own vocabulary:
 | Ecosystem | Artifact | Notes |
 | --- | --- | --- |
 | Maven/Gradle | `synapsys-spring-boot-starter` | `-spring-boot-starter` is a term of art; third-party starters must not be prefixed `spring-boot-` |
-| npm | `@synapsys-io/node-sdk` | the scope is `@synapsys-io` |
+| npm | `@synapsys-io/sdk` | the scope is `@synapsys-io`; on npm the ecosystem is implied, so it is not repeated in the name |
 | PyPI | `basamento-synapsys` | flat namespace; an unrelated `synapsys` package already exists |
 | Go | `github.com/basamento/synapsys-go-sdk` | the module path is the name; there is no registry |
 | NuGet | `Basamento.Synapsys.<Framework>` | prefix reservation applies |
@@ -80,8 +86,15 @@ Every heartbeat carries a `framework` string telling Core which client is
 speaking. Lowercase, no spaces, no version:
 
 ```
-springboot   go   node   python   dotnet   quarkus
+springboot   nodejs   python
 ```
+
+**Core validates this field against a fixed set.** `WorkerFramework.Valid()` accepts
+`springboot`, `nodejs`, `python` and `unknown`, and coerces anything else to
+`unknown` — the exact failure this rule exists to prevent. A new library must have
+its identifier added to Core's enum, to the filter list in `collection.go`, and to
+the frontend card types, **before** the library ships. Until that is done, `go`,
+`dotnet` and `quarkus` are not usable values.
 
 Pick it once per library and never change it — Core stores it and operators
 filter on it. Never send `unknown`; that is Core's fallback for clients that omit
@@ -138,19 +151,49 @@ Every library implements this set. Names are canonical; defaults are normative.
 | `synapsys.fail-fast` | `false` | no | Fail application startup when Core is unreachable. |
 | `synapsys.connect-timeout` | `2s` | no | TCP connect timeout. |
 | `synapsys.request-timeout` | `5s` | no | Whole-request timeout. |
+| `synapsys.capture-console` | `true` | no | Stream process console output to Core. `false` leaves the streams untouched — see §5 and §8. |
 
 \* Not required by the library, but Core rejects heartbeats without it. Warn
 loudly at startup rather than failing.
+
+Libraries may add settings their ecosystem needs — a Node client accepts a `logger`
+object, because Node has no ambient logging framework to discover. Additions are
+recorded in the change log, and anything that turns out to be general is promoted
+into this table.
 
 ### Rules
 
 - **`enabled: false` must be a complete no-op.** No heartbeat task, no console
   capture, no network calls, no startup validation. This is what makes the
   library safe inside a test suite, and it is the reason the setting exists.
-- **Unknown keys under `synapsys.*` should fail startup** where the framework
-  supports strict binding. A typo that silently leaves a default in place is
-  worse than a crash. Where strict binding is unavailable, log a warning naming
-  the unrecognised keys.
+- **Unknown keys under `synapsys.*` fail startup, in every language.** A typo that
+  silently leaves a default in place is worse than a crash: the worker runs on
+  defaults forever and nothing says why. Where the framework binds strictly, turn
+  that on — the Spring starter uses `ignoreUnknownFields = false`. Where the
+  language would otherwise ignore an unrecognised key, as a plain JavaScript object
+  or a Python `**kwargs` does, **validate the option set explicitly and raise**. The
+  error names both the keys that were passed and the full set that was expected:
+
+  ```
+  [Synapsys] Unknown Synapsys options: 'heratBeatinterval'. Expected any of:
+  'enabled', 'coreUrl', 'coreToken', 'workerName', ...
+  ```
+
+  This check runs **even when `enabled` is false**. A disabled test run is exactly
+  where such a typo would otherwise hide. It is a check on the arguments the caller
+  passed, not startup validation, so the no-op rule above does not exempt it.
+
+- **Durations carry units.** Every duration setting is written `'30s'`, `'5m'`,
+  `'250ms'` or `'2h'`, in whatever spelling the ecosystem uses for such a literal. A
+  plain number is accepted and means **milliseconds**, but a unitless string is
+  rejected with a message naming both forms: `'30'` reads as seconds to about half
+  the people who write it, and guessing either way is silently wrong for the other
+  half.
+
+  `heartbeat-interval` is further constrained to a positive whole number of seconds,
+  because the wire format has no other representation. `'1500ms'` is a startup
+  failure, never a silent rounding.
+
 - **Timeouts are mandatory.** A client with no request timeout will eventually
   hang its loop against a wedged Core.
 - Startup **echoes the resolved configuration once** at INFO — worker name,
@@ -474,10 +517,23 @@ Rules:
 - **Attach a monotonic sequence number per run**, so Core can order lines sharing
   a timestamp.
 - **Always uninstall on shutdown.** Replacing global streams and never restoring
-  them leaks across application contexts and breaks test suites.
+  them leaks across application contexts and breaks test suites. Restore only if
+  the streams are still yours: something installed on top of you must not be
+  clobbered.
 - Capture stderr as level `error`, stdout as `info`.
 - Capture uncaught process exceptions as stderr lines, so the stack trace reaches
   the console in Core.
+- **Never enqueue a line whose trimmed message is empty**, and never one with a null
+  `runId`. `sequence` must also be 1 or greater. Core now skips an unreadable log
+  entry and keeps the rest of the beat, as it always did for `processes`, so one such
+  line no longer costs the worker its commands — but it is silently dropped, and a
+  client that emits them is throwing away output it believes it sent. Send only
+  entries Core can store.
+- **Console capture must be individually disableable**, separately from
+  `synapsys.enabled`. §8 requires it, because capture is a data path out of the
+  application that a user must be able to reason about and switch off without
+  losing remote control of their processes. The canonical setting is
+  `synapsys.capture-console`, default `true`.
 
 Where a language makes global stream replacement genuinely unsafe, capture at the
 logging-framework level instead and **say so in that library's README**. Do not
@@ -623,16 +679,41 @@ When a change affects more than one library:
 | Date | Change | Libraries affected |
 | --- | --- | --- |
 | 2026-08-28 | Initial specification, extracted from `synapsys-spring-boot-starter` 0.1.0 | all future |
+| 2026-08-28 | npm artifact renamed `@synapsys-io/node-sdk` → `@synapsys-io/sdk`; on npm the ecosystem is implied by the registry | Node |
+| 2026-08-28 | §1.2 framework identifier for Node corrected `node` → `nodejs`, to match the value Core's `WorkerFramework.Valid()` actually accepts; noted that Core's enum gates every future library's identifier | Node, Go, .NET |
+| 2026-08-28 | §0 relaxed: "no initialisation call" becomes "none where the framework provides a lifecycle; exactly one otherwise". Plain Node, Go and Python have nothing to hook | Node, Go, Python |
+| 2026-08-28 | §2 new rule: **durations carry units**, a bare number means milliseconds, a unitless string is rejected | all |
+| 2026-08-28 | §2 new rule: **unknown options fail startup in every language**, including dynamic ones where the runtime would ignore them, and the check runs even when disabled | all |
+| 2026-08-28 | §5 new rules: never enqueue a blank-message or null-`runId` log line, because Core rejects the whole heartbeat for one; console capture must be individually disableable via `synapsys.capture-console`, now in the §2 settings table | all |
+| 2026-08-28 | §2 notes that libraries may add ecosystem-specific settings; Node adds `logger`, `log-level` | all |
+| 2026-08-28 | Core no longer rejects a heartbeat for one unreadable `logs` entry: it skips the entry and applies the rest, as it already did for `processes`. §5's client rule is unchanged; its rationale is not | all |
 
 ### Known gaps in the surrounding contract
 
-Found while writing this document; not yet resolved:
+**Closed since v1.** `openapi.yaml` now documents the `logs` array in
+`HeartbeatRequest` and declares the `bearerAuth` security scheme. Both were fixed in
+the Core repository before the Node SDK was written against them.
 
-- `openapi.yaml` does **not** document the `logs` array in `HeartbeatRequest`,
-  although Core accepts and stores it and the Spring starter sends it on every
-  beat.
-- `openapi.yaml` declares **no security scheme**, although Core requires a bearer
-  token on the heartbeat endpoint.
+Also closed: `ProcessLogCapture` in the Spring starter skipped only `line.isEmpty()`,
+so a process printing a line of whitespace enqueued a blank-message entry that Core
+rejected the whole heartbeat for — dropping every process command on that beat — and
+that the client requeued at the front and retried forever, leaving the worker deaf to
+start and stop. Fixed on the starter's `main` by skipping a line whose trimmed
+message is empty, using Go's definition of whitespace rather than Java's narrower
+one; it ships in 0.1.2, which is not yet on Central. Core was hardened in the same
+change: `toSyncServiceRequest` now skips an unreadable log entry and keeps the rest
+of the batch, mirroring what it has always done for `processes`, so no client can
+wedge itself this way again — which is what actually closes the gap for workers
+already running an older starter. `openapi.yaml` documents the new skip semantics.
 
-Both should be fixed in the Core repository before a second library is written
-against the OpenAPI file.
+Open, found while writing the Node SDK:
+
+- **Core's `WorkerFramework` enum has no room for the planned libraries.** It
+  accepts only `springboot`, `nodejs`, `python` and `unknown`, so the `go`, `dotnet`
+  and `quarkus` identifiers named in §1.2 would each be recorded as `unknown`. The
+  enum, the filter list in `collection.go`, and the frontend `WorkerCard` /
+  `ProcessCard` types all need the value added before such a library ships.
+
+- **Workers flap after a single missed beat.** `toNeuronDTO` marks a worker inactive
+  after one heartbeat interval, which disables the Start/Stop buttons in the
+  console. A 2.5–3x grace multiplier was proposed and deferred.
