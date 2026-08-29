@@ -1,6 +1,6 @@
 ---
 title: 2. An endless process
-description: Add a process that runs until told to stop, and stop it cleanly.
+description: Register a long-running process, start it from Core, view its output, and stop it cooperatively.
 sidebar_position: 2
 ---
 
@@ -9,75 +9,87 @@ import TabItem from '@theme/TabItem';
 
 # 2. An endless process
 
-A worker with no processes is just a heartbeat. Now we add something startable.
+An endless process runs until an operator asks it to stop. It must check the
+library's cancellation signal and return promptly.
 
-## Declare it
+## Register `ticker`
 
 <Tabs groupId="connection">
 <TabItem value="spring-boot" label="Spring Boot">
 
-```java
-@SynapsysProcess(name = "ticker", type = ENDLESS)
-public class Ticker extends AbstractSynapsysProcess {
-
+```java title="Ticker.java"
+@SynapsysProcess(name = "ticker")
+public class Ticker extends AbstractEndlessProcess {
     @Override
-    public void run(StopSignal stop) {
-        while (!stop.requested()) {
-            log.info("tick");
-            stop.sleep(Duration.ofSeconds(2));
+    protected void runForever(StopSignal stopSignal) throws Exception {
+        while (!stopSignal.isStopRequested()) {
+            System.out.println("tick");
+            Thread.sleep(2_000);
         }
-        log.info("stopped cleanly");
+        System.out.println("stopped cleanly");
     }
 }
 ```
 
-`stop.sleep` is not `Thread.sleep` — it returns early when a stop arrives, so a
-process with a long interval still stops promptly.
+Keep blocking intervals short enough for the stop requirement of your system.
+
+</TabItem>
+<TabItem value="nodejs" label="Node.js">
+
+Register before `synapsys.start()`:
+
+```js
+synapsys.endless('ticker', async (stop) => {
+  while (!stop.requested) {
+    console.log('tick');
+    await stop.sleep('2s');
+  }
+  console.log('stopped cleanly');
+});
+```
+
+`stop.sleep()` wakes immediately on stop and is preferable to a bare timer.
 
 </TabItem>
 <TabItem value="raw-api" label="Raw API">
 
-Declare it by including it in the batch:
+Include the process in every heartbeat:
 
 ```json
 {
   "workerName": "hello-worker",
-  "framework": "curl",
-  "host": "laptop",
+  "framework": "unknown",
   "heartbeatInterval": 5,
   "processes": [
-    { "name": "ticker", "type": "endless", "currentState": "idle", "ackToken": 0 }
+    {
+      "name": "ticker",
+      "type": "endless",
+      "currentState": "idle",
+      "ackToken": 0,
+      "runId": null
+    }
   ]
 }
 ```
 
-The Core creates the process on first sight. Your loop must now read the response
-and act on it — see [applying commands](/manuals/raw-api/the-heartbeat-loop).
+Your client must compare command tokens and own the execution lifecycle. Use the
+[Raw API checklist](/manuals/raw-api/checklist).
 
 </TabItem>
 </Tabs>
 
-## Start it
+## Start and inspect it
 
-Restart, open the console, find `ticker` under your worker in state `idle`, and
-press **Start**.
-
-Within one interval the state becomes `running` and the logs start ticking.
+Restart the worker, open **Processes**, and choose **Start** for `ticker`. Within one
+heartbeat it reports `running`. Open **Executions** and its logs; new `tick` lines
+arrive through later heartbeats.
 
 ## Stop it
 
-Press **Stop**. Watch the state closely — it becomes `stopping` first, and only
-becomes `idle` once your loop has actually returned.
+Choose **Stop**. The process first reports `stopping`, then `idle` after its body
+returns. If it remains in `stopping`, the body is blocked or is not observing the
+stop signal.
 
-That intermediate state is real, not cosmetic. It means the Core has asked and is
-waiting. A process that ignores the stop signal stays in `stopping` forever, which
-is exactly the signal you want.
-
-## Try breaking it
-
-Press **Stop** twice quickly. The process stops once.
-
-The second press increments `desiredToken` again, but by the time your worker sees
-it the process is already stopping and the applied token has moved past it. This
-is the token comparison doing its job — see
-[the heartbeat protocol](/docs/concepts/heartbeat-protocol).
+Commands carry increasing tokens. Repeated heartbeat responses cannot start a
+second copy because the worker applies only a token newer than the one it has
+acknowledged.

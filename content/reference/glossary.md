@@ -6,23 +6,17 @@ sidebar_position: 1
 
 # Glossary
 
-The naming is biological on purpose — the product centralises scattered programs
-the way a nervous system centralises scattered signals.
+These terms are used consistently by Core, the official libraries, and the HTTP API.
 
 ### Core
 
-The central node, also called the *nucleus*. One Go binary with the console
-compiled in and a SQLite database. The only component that stores anything.
-
-### Neuron
-
-A worker: one of your applications, connected to the Core. Identified by
-`workerName`, which must be stable across restarts.
+The self-hosted control plane and operator console. It receives worker heartbeats,
+records state and history, and returns pending process commands.
 
 ### Worker
 
-The same thing as a neuron. *Worker* is used in the API and configuration;
-*neuron* is used when talking about the model.
+One application connected to Core. It is identified by `workerName`, which must be
+stable across restarts.
 
 ### Process
 
@@ -36,7 +30,7 @@ A process that runs until told to stop. Cooperates with a stop signal.
 ### Progressive process
 
 A process that runs to completion on its own and reaches `idle` by finishing.
-Cancelled by interruption rather than by a flag.
+It cooperates with the cancellation mechanism provided by its client library.
 
 ### Execution
 
@@ -46,7 +40,8 @@ process appends a new execution record; completed executions remain in history.
 ### Run id
 
 The identifier the Core assigns to an in-flight execution. Present in the
-heartbeat while a run is active; carried back unchanged by the worker.
+heartbeat while a run is active; carried back unchanged by the worker. Treat it as
+an opaque signed 64-bit value.
 
 ### Desired state
 
@@ -71,7 +66,18 @@ This is what makes commands idempotent.
 ### Heartbeat
 
 The single outbound POST a worker makes on a fixed interval, carrying every
-process it owns and receiving the Core's desired states in reply.
+process it owns, optional captured output, and receiving Core's desired states in
+reply. It is authenticated with a worker bearer token.
+
+### Worker token
+
+A bearer credential accepted by the heartbeat endpoint. Named tokens can be created
+and revoked in Core Settings. Their secret is displayed only at creation.
+
+### Execution log
+
+Captured stdout or stderr produced during one process run and associated with that
+execution in Core.
 
 ### Framework
 

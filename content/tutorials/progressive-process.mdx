@@ -1,0 +1,95 @@
+---
+title: 3. A progressive process
+description: Run finite work once, report its output, and cancel it at safe boundaries.
+sidebar_position: 3
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# 3. A progressive process
+
+A progressive process performs one finite run and returns to `idle` when it
+finishes. It fits imports, migrations, report generation, cache rebuilds, and other
+work that has a clear end.
+
+## Register `monthly-report`
+
+<Tabs groupId="connection">
+<TabItem value="spring-boot" label="Spring Boot">
+
+```java title="MonthlyReport.java"
+@SynapsysProcess(name = "monthly-report")
+public class MonthlyReport extends AbstractProgressiveProcess {
+    private final ReportService reports;
+
+    public MonthlyReport(ReportService reports) {
+        this.reports = reports;
+    }
+
+    @Override
+    protected void run() throws Exception {
+        for (Account account : reports.accounts()) {
+            checkCancelled();
+            reports.buildFor(account);
+            System.out.println("completed " + account.id());
+        }
+    }
+}
+```
+
+Call `checkCancelled()` between units of work. Blocking I/O should have its own
+timeout so interruption can be observed.
+
+</TabItem>
+<TabItem value="nodejs" label="Node.js">
+
+```js
+synapsys.progressive('monthly-report', async (ctx) => {
+  for (const account of accounts) {
+    ctx.throwIfCancelled();
+    await buildReport(account, { signal: ctx.signal });
+    console.log(`completed ${account.id}`);
+  }
+});
+```
+
+Pass `ctx.signal` to APIs that accept an `AbortSignal`. A stop then cancels in-flight
+I/O instead of waiting for it to finish.
+
+</TabItem>
+<TabItem value="raw-api" label="Raw API">
+
+Report the process as `progressive`. When a newer start token arrives, create one run,
+preserve its `runId`, and report `running`. Report `idle` after the body completes.
+
+```json
+{
+  "name": "monthly-report",
+  "type": "progressive",
+  "currentState": "idle",
+  "ackToken": 0,
+  "runId": null
+}
+```
+
+Your client must prevent a duplicate response from starting a second run. Follow the
+[Raw API checklist](/manuals/raw-api/checklist).
+
+</TabItem>
+</Tabs>
+
+## Run and inspect it
+
+1. Restart the worker and open **Processes**.
+2. Start `monthly-report`.
+3. Open **Executions** and watch the captured progress lines.
+4. Let the run finish. Its current state returns to `idle` without a stop command.
+5. Start it again and confirm that Core creates a separate execution.
+
+## Cancel a run
+
+Start it once more and choose **Stop** while it is processing. The worker reports
+`stopping`, reaches its next cancellation point, and returns to `idle`. If it cannot
+stop promptly, shorten the distance between cancellation checks or make the current
+I/O cancellable.

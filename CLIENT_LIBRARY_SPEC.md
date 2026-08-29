@@ -343,6 +343,23 @@ Not optional:
   transient network error loses exactly the output the user needs.
 - **Parse responses leniently.** Unknown fields are ignored, never rejected — see
   §7.2.
+- **`runId` is an opaque 64-bit token, never a number to compute with.** Core
+  generates it from the wall clock in nanoseconds, so it is a 19-digit int64. Any
+  language whose JSON numbers are IEEE-754 doubles — JavaScript above all, but also
+  Lua, and Java/C# clients that deserialise into `double` — silently rounds it and
+  echoes back a value that is close to, but not, what Core sent.
+
+  The failure is invisible from both ends. The heartbeat still succeeds, nothing is
+  logged, and Core's log ingestion joins on `run_id`, matches no execution, and
+  discards the lines *deliberately*, so that stale logs cannot fail a healthy
+  heartbeat. The symptom is console output that never appears, with nothing
+  anywhere to explain it.
+
+  Carry it as a string, a big integer, or the language's native int64, and echo it
+  back byte for byte. **Send it as a JSON number**: Core's DTO is `*int64` and Go
+  will not unmarshal a JSON string into one. `ackToken` and `desiredToken` are also
+  int64, but they are small increments and safe as ordinary numbers — they are also
+  compared numerically, so they must stay numbers.
 
 ### 4.3 Applying commands
 
@@ -686,6 +703,7 @@ When a change affects more than one library:
 | 2026-08-28 | §2 new rule: **unknown options fail startup in every language**, including dynamic ones where the runtime would ignore them, and the check runs even when disabled | all |
 | 2026-08-28 | §5 new rules: never enqueue a blank-message or null-`runId` log line, because Core rejects the whole heartbeat for one; console capture must be individually disableable via `synapsys.capture-console`, now in the §2 settings table | all |
 | 2026-08-28 | §2 notes that libraries may add ecosystem-specific settings; Node adds `logger`, `log-level` | all |
+| 2026-08-28 | §4.2 new rule: **`runId` is an opaque int64** and must round-trip exactly. Found in the Node SDK, where JSON.parse rounded Core's 19-digit nanosecond id and every captured log line was then silently discarded by Core | all, especially JS/TS |
 | 2026-08-28 | Core no longer rejects a heartbeat for one unreadable `logs` entry: it skips the entry and applies the rest, as it already did for `processes`. §5's client rule is unchanged; its rationale is not | all |
 
 ### Known gaps in the surrounding contract
@@ -713,6 +731,12 @@ Open, found while writing the Node SDK:
   and `quarkus` identifiers named in §1.2 would each be recorded as `unknown`. The
   enum, the filter list in `collection.go`, and the frontend `WorkerCard` /
   `ProcessCard` types all need the value added before such a library ships.
+
+- **Core uses `time.Now().UnixNano()` as the `runId`.** It is unique and cheap, but
+  it is also a 19-digit int64 that no IEEE-754 double can represent, which cost the
+  Node SDK a silent log-loss bug before release. Clients can and now do handle it,
+  but a smaller monotonic counter, or a string id, would remove the trap for every
+  future library. Worth considering before a third client is written.
 
 - **Workers flap after a single missed beat.** `toNeuronDTO` marks a worker inactive
   after one heartbeat interval, which disables the Start/Stop buttons in the

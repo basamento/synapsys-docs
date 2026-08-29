@@ -1,49 +1,39 @@
 ---
 title: The heartbeat loop
-description: The request, the response, and the token comparison at the centre of it.
-sidebar_position: 2
+description: Send an authenticated process snapshot, receive commands, acknowledge tokens, and report execution logs.
 ---
 
 # The heartbeat loop
 
+Send a heartbeat every few seconds with a bounded timeout. Every request is a full
+process snapshot and must carry a worker bearer token.
+
 ## Request
 
-```http
-POST /api/v1/workers/heartbeat HTTP/1.1
-Content-Type: application/json
+```bash
+curl --request POST 'https://core.example.com/api/v1/workers/heartbeat' \
+  --header "Authorization: Bearer ${SYNAPSYS_CORE_TOKEN}" \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "workerName": "billing-api",
+    "framework": "unknown",
+    "host": "billing-01",
+    "heartbeatInterval": 5,
+    "processes": [
+      {
+        "name": "invoice-poller",
+        "type": "endless",
+        "currentState": "idle",
+        "ackToken": 0,
+        "runId": null
+      }
+    ],
+    "logs": []
+  }'
 ```
 
-```json
-{
-  "workerName": "billing-jobs",
-  "framework": "custom",
-  "host": "billing-01",
-  "heartbeatInterval": 5,
-  "processes": [
-    {
-      "name": "nightly-sync",
-      "type": "endless",
-      "currentState": "running",
-      "ackToken": 7
-    }
-  ]
-}
-```
-
-### Fields
-
-| Field | Type | Notes |
-|---|---|---|
-| `workerName` | string | Stable across restarts. This is your identity. |
-| `framework` | string | Your runtime. Omit it and the Core records `unknown` — it never guesses. |
-| `host` | string | Omit it and the Core falls back to the TCP remote address, usually a container IP. |
-| `heartbeatInterval` | integer | **Positive whole seconds.** Match the interval you actually use. |
-| `processes[].name` | string | Unique within this worker, not globally. |
-| `processes[].type` | string | `endless` or `progressive`. |
-| `processes[].currentState` | string | `idle`, `running`, `stopping` or `failed`. |
-| `processes[].ackToken` | integer | The last `desiredToken` you applied. The most important field in the document. |
-
-Send **every** process you own on **every** beat, not just the ones that changed.
+`heartbeatInterval` is a positive whole number of seconds. Send every process on
+every request, including idle processes.
 
 ## Response
 
@@ -51,42 +41,53 @@ Send **every** process you own on **every** beat, not just the ones that changed
 {
   "processes": [
     {
-      "name": "nightly-sync",
-      "desiredState": "stopping",
-      "desiredToken": 8
+      "name": "invoice-poller",
+      "type": "endless",
+      "currentState": "idle",
+      "desiredState": "running",
+      "desiredToken": 1,
+      "ackToken": 0,
+      "runId": 1788012345678901234
     }
   ]
 }
 ```
 
-A `runId` is present when the Core has assigned one to an in-flight execution.
-Carry it back unchanged on subsequent beats.
+For each returned process:
 
-## The comparison
+1. Ignore a token lower than or equal to the locally acknowledged token.
+2. Map `running` to start and `stopping` to cooperative stop.
+3. Treat `idle` as “no outstanding command,” not as a stop instruction.
+4. Handle the command.
+5. Advance `ackToken` only after handling succeeds.
+6. Echo the assigned `runId` on later process snapshots and log entries.
 
-This is the whole protocol:
+`runId` is an opaque signed 64-bit value. JavaScript and other runtimes backed by
+IEEE-754 numbers cannot represent every value exactly. Parse and preserve it with a
+64-bit-safe JSON strategy, then send it back as a JSON number without changing its
+digits.
 
+## Report logs
+
+Add complete lines produced during a run:
+
+```json
+{
+  "processName": "invoice-poller",
+  "runId": 1788012345678901234,
+  "sequence": 1,
+  "timestamp": "2026-08-29T09:30:00Z",
+  "source": "stdout",
+  "level": "info",
+  "message": "poll completed"
+}
 ```
-for each process in response:
-    if process.desiredToken > stored_ack_token[process.name]:
-        apply(process.desiredState)
-        stored_ack_token[process.name] = process.desiredToken
-```
 
-Three rules that clients get wrong:
+Sequence numbers increase within a run. Use `stderr` with `error` for error output.
+Do not send blank messages, a missing `runId`, or a sequence below one. Bound the
+queue and batch size so a noisy process cannot exhaust memory or create an oversized
+heartbeat.
 
-1. **`desiredState: "idle"` is not a stop.** It means there is no outstanding
-   command. Stop is `stopping`.
-2. **Update `ackToken` after the local handler accepts the command, not before.**
-   If you update first and then the handler fails, the command is lost — the Core
-   will consider it acknowledged.
-3. **Equal tokens are duplicates.** Only strictly greater means "new".
-
-## Failure handling
-
-The Core being unreachable is not a reason to stop anything. Keep your processes
-running, keep your `ackToken` values, and keep retrying. Command state lives in
-the Core's database, not in the connection — a restart on either side converges
-on the next successful beat.
-
-Use a connect timeout and a request timeout. A hung Core must not stall the loop.
+If the request fails or Core rejects it, put drained log lines back at the front of
+the queue and retry later. A heartbeat failure must never stop a user's running
+process or terminate the loop.

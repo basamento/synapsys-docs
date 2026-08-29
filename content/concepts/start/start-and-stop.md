@@ -1,55 +1,56 @@
 ---
 title: Start and stop a process
-description: Declare a process, then drive it from the console.
-sidebar_position: 4
+description: Register a small process, control it from the console, and inspect its captured output.
 ---
 
 # Start and stop a process
 
-A worker with no processes is just a heartbeat. Processes are the things you
-actually start and stop.
+A process is a named unit of work owned by one worker. Register one with your
+library, restart the application, and Core will discover it on the next heartbeat.
 
-## Declare one
+## Spring Boot example
 
-```java
-@SynapsysProcess(name = "nightly-sync", type = ENDLESS)
-public class NightlySync extends AbstractSynapsysProcess {
-
+```java title="InvoicePoller.java"
+@SynapsysProcess(name = "invoice-poller")
+public class InvoicePoller extends AbstractEndlessProcess {
     @Override
-    public void run(StopSignal stop) {
-        while (!stop.requested()) {
-            reconcileInvoices();
-            stop.sleep(Duration.ofMinutes(5));
+    protected void runForever(StopSignal stopSignal) throws Exception {
+        while (!stopSignal.isStopRequested()) {
+            System.out.println("checking for invoices");
+            Thread.sleep(5_000);
         }
     }
 }
 ```
 
-Two things are doing work here:
+## Node.js example
 
-- **`type = ENDLESS`** — this process runs until told to stop. The alternative is
-  `PROGRESSIVE`, which runs to completion on its own.
-- **`stop.requested()`** — stopping is cooperative. The Core asks; your loop
-  decides when it is safe to leave. A process that never checks the signal cannot
-  be stopped.
+Add this registration before `synapsys.start()`:
 
-## Drive it
+```js
+synapsys.endless('invoice-poller', async (stop) => {
+  while (!stop.requested) {
+    console.log('checking for invoices');
+    await stop.sleep('5s');
+  }
+});
+```
 
-Restart the application. `nightly-sync` now appears under the worker in the
-console, in state `idle`.
+## Drive it from the console
 
-Press **Start**. Within one heartbeat the state becomes `running`.
+1. Open **Processes** and select `invoice-poller`.
+2. Choose **Start**. The command is delivered on the next heartbeat.
+3. Watch the state move from `idle` to `running`.
+4. Open **Executions**, select the run, and open its logs.
+5. Choose **Stop**. The worker receives a cooperative stop signal and reports
+   `idle` after the process exits.
 
-Press **Stop**. The state becomes `stopping` first, then `idle` once your loop has
-actually returned — not before. That intermediate state is the honest one: it
-means the Core has asked and is waiting.
+The console navigation and entity cards adapt to mobile screens. On a phone, open
+the navigation drawer to move between Workers, Processes, Executions, Actions, and
+Settings; the same start, stop, and log views remain available.
 
-## What just happened
+If a process stays in `stopping`, its body is not cooperating with cancellation.
+Use the library-specific guides for the correct pattern:
 
-The console did not call your application. It could not — your application has no
-open port. It wrote a desired state into the Core's database, and your worker
-picked it up on its next heartbeat.
-
-That indirection is the whole design. Read
-[the heartbeat protocol](../concepts/heartbeat-protocol) for how it avoids
-applying the same command twice.
+- [Spring Boot processes and logs](/manuals/spring-boot/processes-and-logs)
+- [Node.js processes and logs](/manuals/nodejs/processes-and-logs)

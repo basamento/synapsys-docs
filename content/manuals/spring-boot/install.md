@@ -1,58 +1,93 @@
 ---
-title: Install
-description: Add the Synapsys starter to a Spring Boot application.
-sidebar_position: 1
+title: Install and adopt
+description: Add the Synapsys Spring Boot starter from Maven Central and wrap existing background work.
 ---
 
-# Install the Spring Boot starter
+# Install and adopt
 
-:::info Not published yet
-The artifact is not on Maven Central. Build and install it locally:
+The Spring Boot starter turns application beans into remotely operated Synapsys
+processes. It discovers them, manages their lifecycle, sends heartbeats, and captures
+per-run console output without adding a controller or inbound port.
 
-```bash
-git clone https://github.com/JMarzoli/synapsys-springboot-starter.git
-cd synapsys-springboot-starter
-./mvnw install
-```
+**Requirements:** Java 17 or later, Spring Boot 3.x, a reachable Core, and a worker
+token.
 
-A Maven wrapper is included, so Maven does not need to be on your PATH.
-:::
+## Install from Maven Central
 
-## Maven
+Maven needs no additional repository:
 
 ```xml title="pom.xml"
 <dependency>
-  <groupId>com.synapsys</groupId>
-  <artifactId>synapsys-springboot-starter</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <groupId>org.basamento.synapsys</groupId>
+  <artifactId>synapsys-spring-boot-starter</artifactId>
+  <version>0.1.0</version>
 </dependency>
 ```
 
-## Gradle
+Gradle:
 
-```kotlin title="build.gradle.kts"
-implementation("com.synapsys:synapsys-springboot-starter:1.0-SNAPSHOT")
+```groovy title="build.gradle"
+implementation 'org.basamento.synapsys:synapsys-spring-boot-starter:0.1.0'
 ```
+
+## Before and after
+
+Suppose an application starts a poller itself:
+
+```java title="Before: InvoicePoller.java"
+@Component
+public class InvoicePoller {
+    @Scheduled(fixedDelay = 30_000)
+    public void poll() {
+        invoiceService.importNewInvoices();
+    }
+}
+```
+
+With Synapsys, the business call stays where it is. The process runs only after an
+operator starts it and cooperates when asked to stop:
+
+```java title="After: InvoicePoller.java"
+@SynapsysProcess(name = "invoice-poller")
+public class InvoicePoller extends AbstractEndlessProcess {
+    private final InvoiceService invoiceService;
+
+    public InvoicePoller(InvoiceService invoiceService) {
+        this.invoiceService = invoiceService;
+    }
+
+    @Override
+    protected void runForever(StopSignal stopSignal) throws Exception {
+        while (!stopSignal.isStopRequested()) {
+            invoiceService.importNewInvoices();
+            Thread.sleep(30_000);
+        }
+    }
+}
+```
+
+`@SynapsysProcess` is a Spring stereotype, so component scanning finds it. Omit
+`name` to use the bean name, but an explicit stable name is easier to recognise in
+the console.
 
 ## Minimum configuration
 
 ```yaml title="application.yaml"
 spring:
   application:
-    name: billing-jobs
+    name: billing-api
 
 synapsys:
-  core-url: http://localhost:8080
+  core-url: ${SYNAPSYS_CORE_URL}
+  core-token: ${SYNAPSYS_CORE_TOKEN}
 ```
 
-The starter auto-configures itself. There is nothing to enable and no annotation
-to add to your application class.
+```dotenv title="runtime environment"
+SYNAPSYS_CORE_URL=https://core.example.com
+SYNAPSYS_CORE_TOKEN=syn_replace_with_your_token
+```
 
-## Requirements
+The starter auto-configures itself and starts with the application. The worker
+should appear in Core within five seconds.
 
-- **Java 17 or later.** The starter targets Java 17. The bundled example and
-  workspace development scripts use Java 21; its Lombok version is not currently
-  compatible with JDK 25.
-- Spring Boot 3.x.
-
-Next: [configuration](./configuration).
+Next: [configure environments and failure behaviour](./configuration).

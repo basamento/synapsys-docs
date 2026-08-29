@@ -64,9 +64,9 @@ will consider it done.
 
 ## Why this is in the docs, not just the code
 
-Every future starter — Go, Python, whatever comes after — reimplements this loop.
-It is the one piece of Synapsys that cannot be encapsulated in a library, because
-it *is* the thing each library independently has to get right.
+Every official SDK and custom client implements this loop. It is the one piece of
+Synapsys that cannot be shared across runtimes, because it *is* the thing each
+integration independently has to get right.
 
 That is also why Raw API is a first-class connection method rather than a
 fallback: the protocol is the product.

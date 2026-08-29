@@ -1,58 +1,75 @@
 ---
-title: Your first worker
-description: Add the starter to a Spring Boot application and watch it appear in the console.
-sidebar_position: 3
+title: Connect your first worker
+description: Add the Spring Boot starter or Node.js SDK, set two connection values, and appear in Core.
 ---
 
-# Your first worker
+# Connect your first worker
 
-A worker is an application of yours that heartbeats to the Core. Nothing needs to
-be registered in advance — the first heartbeat is the registration.
+A worker needs a stable name, the Core URL, and a worker token. Choose the library
+that matches your application; both use the same environment variable names for
+the connection.
 
-## Add the dependency
+## Spring Boot
 
-:::info Not published yet
-The starter is not on Maven Central. Build it locally and install it into your
-local repository first:
-
-```bash
-git clone https://github.com/JMarzoli/synapsys-springboot-starter.git
-cd synapsys-springboot-starter
-./mvnw install
-```
-:::
+Add the Maven Central dependency:
 
 ```xml title="pom.xml"
 <dependency>
-  <groupId>com.synapsys</groupId>
-  <artifactId>synapsys-springboot-starter</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <groupId>org.basamento.synapsys</groupId>
+  <artifactId>synapsys-spring-boot-starter</artifactId>
+  <version>0.1.0</version>
 </dependency>
 ```
 
-## Point it at the Core
+Then bind the connection values:
 
 ```yaml title="application.yaml"
 spring:
   application:
-    name: billing-jobs
+    name: billing-api
 
 synapsys:
-  core-url: http://localhost:8080
+  core-url: ${SYNAPSYS_CORE_URL}
+  core-token: ${SYNAPSYS_CORE_TOKEN}
 ```
 
-That is the minimum. `worker-name` falls back to `spring.application.name`, the
-host is taken from the machine, and the heartbeat interval defaults to 5 seconds.
+The starter begins heartbeating automatically when the application starts.
 
-:::caution
-A typo in any `synapsys.*` key **fails startup**. That is deliberate — a silently
-ignored setting is far more expensive to debug than a failed boot. If the
-application will not start, read the key name in the error before anything else.
-:::
+## Node.js
 
-## Start it
+Install the public npm package:
 
-Run your application. Within one heartbeat interval it appears in the console at
-http://localhost:8080 with no processes yet.
+```bash
+npm install @synapsys-io/sdk@0.1.1
+```
 
-Next: [start and stop a process](./start-and-stop).
+Register and start the worker in your entry point:
+
+```js title="app.js"
+const { Synapsys } = require('@synapsys-io/sdk');
+
+const synapsys = new Synapsys({ workerName: 'billing-api' });
+synapsys.start();
+```
+
+`coreUrl` and `coreToken` are read from the environment. ESM users can import the
+same API with `import { Synapsys } from '@synapsys-io/sdk'`.
+
+## Set the environment
+
+Point the worker at the local Core and use the worker credential from
+`synapsys.env`:
+
+```dotenv
+SYNAPSYS_CORE_URL=http://localhost:8080
+SYNAPSYS_CORE_TOKEN=replace-with-your-worker-token
+```
+
+Use your runtime, service manager, or secret store to inject these values. Do not
+commit a real token to `application.yaml`, `.env`, a container image, or an example.
+
+Start the application, sign in to Core, and open **Workers**. The worker should
+appear within one heartbeat interval (five seconds by default). No inbound port on
+the worker is required.
+
+Next: [register, start, and stop a process](/docs/start/start-and-stop).

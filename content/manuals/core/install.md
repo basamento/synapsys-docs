@@ -1,52 +1,66 @@
 ---
 title: Install
-description: Build and run the Core.
-sidebar_position: 1
+description: Run Synapsys Core from GitHub Container Registry with persistent storage and bootstrap credentials.
 ---
 
-# Install the Core
+# Install Core
 
-The Core is one Go binary with the React console compiled into it via `go:embed`.
-One artifact, one port, one file of state.
+The supported Core distribution is the container image
+`ghcr.io/jmarzoli/synapsys-core`. It exposes the console and API on port `8080` and
+needs a persistent volume plus bootstrap credentials.
 
-:::info Early development image
-The Core image is private and pre-1.0. Authenticate to GitHub Container Registry
-and use an explicit version tag such as `0.1.0` or `0.1.0-alpha.1`.
-:::
+## Docker Compose
 
-## Docker
+Create a Compose file:
 
-```bash
-docker login ghcr.io
-docker pull ghcr.io/jmarzoli/synapsys-core:0.1.0
-docker run -p 8080:8080 -v synapsys-data:/app/data ghcr.io/jmarzoli/synapsys-core:0.1.0
+```yaml title="compose.yaml"
+services:
+  core:
+    image: ghcr.io/jmarzoli/synapsys-core:latest
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    env_file:
+      - synapsys.env
+    volumes:
+      - synapsys-data:/app/data
+
+volumes:
+  synapsys-data:
 ```
 
-The image is built through a multi-stage workflow: Node builds the frontend, Go
-embeds it and compiles a static binary, and the runtime image is Alpine with just
-that binary.
+Create `synapsys.env` outside source control:
 
-## What it needs
+```dotenv title="synapsys.env"
+SYNAPSYS_AUTH_USERNAME=operator
+SYNAPSYS_AUTH_PASSWORD=replace-with-a-long-random-password
+```
 
-| | |
-|---|---|
-| Port | `8080` |
-| State | SQLite at `/app/data/nucleus.db` |
-| Volume | `/app/data` — **required** if you want your data to survive |
-| External services | none |
+Then start and verify Core:
 
-## Networking
+```bash
+docker compose up -d
+curl http://localhost:8080/api/health
+```
 
-Workers need to reach the Core's `/api/v1/workers/heartbeat` endpoint outbound.
-The Core needs to reach nothing.
+Open `http://localhost:8080` and sign in. The expected health response is
+`{"status":"ok"}`.
 
-If you run the console from a separate origin during development, note that the
-Core's CORS layer allows exactly one origin — `http://localhost:5173`, the Vite
-dev server. In production the console is served by the Core itself and CORS does
-not apply.
+Create a named worker token in **Settings** before connecting an application. The
+optional deployment-wide `SYNAPSYS_WORKER_TOKEN` is documented under
+[authentication](./authentication), but is not required to start Core.
 
-## Upgrading
+## Production checklist
 
-Schema migrations are tracked in a `schema_migrations` ledger and applied at
-startup. Migrations that have already been applied are never edited; a change
-means a new migration. Back up `nucleus.db` before upgrading anyway.
+- Pin an immutable image version after validating it in your environment.
+- Put Core behind HTTPS and set `SYNAPSYS_AUTH_COOKIE_SECURE=true`.
+- Store passwords and tokens in your platform's secret mechanism.
+- Persist and back up `/app/data`.
+- Restrict the operator console to the networks and identities that need it.
+- Keep the health endpoint available to your orchestrator or monitor.
+
+The console is responsive and remains navigable on desktop, tablet, and mobile
+browsers. Mobile support does not change the network-security requirement: expose
+it only through your normal protected HTTPS entry point.
+
+Next: [configure operator and worker authentication](./authentication).

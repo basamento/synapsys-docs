@@ -1,66 +1,76 @@
 ---
 title: Configuration
-description: Every synapsys.* property the starter reads.
-sidebar_position: 2
+description: Configure the Spring Boot starter with properties, environment variables, and deployment-safe defaults.
 ---
 
 # Configuration
 
-Every property lives under the `synapsys` prefix.
+All settings use Spring Boot's `synapsys.*` configuration namespace. Keep public
+configuration in `application.yaml` and inject URLs and credentials through the
+environment or your platform's secret store.
 
-:::caution A typo fails startup
-The starter binds with `ignoreUnknownFields = false`. An unrecognised
-`synapsys.*` key stops the application from booting rather than being silently
-ignored.
-
-This is deliberate. A misspelled `heartbeat-interval-ms` that binds to nothing
-leaves a worker running on defaults with no indication why — and that is far more
-expensive to find than a failed boot with the bad key named in the error.
-:::
-
-## Properties
-
-| Property | Type | Default | Notes |
-|---|---|---|---|
-| `synapsys.core-url` | String | — | **Required.** Base URL of the Core, no trailing slash. |
-| `synapsys.worker-name` | String | `spring.application.name` | Must be stable across restarts — it is how the Core recognises a returning worker. |
-| `synapsys.host` | String | machine hostname | Set it explicitly when the resolved name is meaningless, as with a container id. |
-| `synapsys.heartbeat-interval` | Duration | `5s` | Positive whole seconds: `1s`, `5s`, `1m`. |
-| `synapsys.fail-fast` | boolean | `false` | Whether an unreachable Core at startup stops the application. |
-| `synapsys.connect-timeout` | Duration | `2s` | Connect timeout for the heartbeat call. |
-| `synapsys.request-timeout` | Duration | `5s` | Read timeout for the heartbeat call. |
-
-## A full example
+## Recommended application configuration
 
 ```yaml title="application.yaml"
 spring:
   application:
-    name: billing-jobs
+    name: billing-api
 
 synapsys:
-  core-url: http://synapsys-core.internal:8080
-  worker-name: billing-jobs
-  host: billing-01.eu-west
-  heartbeat-interval: 5s
-  fail-fast: false
-  connect-timeout: 2s
-  request-timeout: 5s
+  enabled: ${SYNAPSYS_ENABLED:true}
+  core-url: ${SYNAPSYS_CORE_URL}
+  core-token: ${SYNAPSYS_CORE_TOKEN}
+  worker-name: ${SYNAPSYS_WORKER_NAME:${spring.application.name}}
+  host: ${SYNAPSYS_HOST:}
+  heartbeat-interval: ${SYNAPSYS_HEARTBEAT_INTERVAL:5s}
+  fail-fast: ${SYNAPSYS_FAIL_FAST:false}
+  connect-timeout: ${SYNAPSYS_CONNECT_TIMEOUT:2s}
+  request-timeout: ${SYNAPSYS_REQUEST_TIMEOUT:5s}
 ```
 
-## Choosing an interval
+Spring translates property names to uppercase underscore environment names. For a
+container or service definition, the minimum secret-bearing environment is:
 
-The interval is the upper bound on how long a start or stop takes to be picked
-up. Five seconds is a reasonable default for background jobs.
+```dotenv
+SYNAPSYS_CORE_URL=https://core.example.com
+SYNAPSYS_CORE_TOKEN=syn_replace_with_your_token
+```
 
-Lowering it makes the console feel more responsive and costs one HTTP request per
-worker per interval. Raising it beyond about thirty seconds makes the console feel
-broken, because a button press appears to do nothing for half a minute.
+## Properties
 
-The v1 wire protocol represents this value as an integer number of seconds, so
-sub-second durations are rejected at startup.
+| Property | Default | Description |
+| --- | --- | --- |
+| `synapsys.enabled` | `true` | `false` disables heartbeats and capture; useful in tests and developer runs. |
+| `synapsys.core-url` | none | Required base URL of Core. |
+| `synapsys.core-token` | none | Worker bearer token. Core rejects a heartbeat without it. |
+| `synapsys.worker-name` | `spring.application.name` | Stable identity across restarts. Required if the application name is absent. |
+| `synapsys.host` | machine hostname | Host label reported to Core. Set it when an automatic container hostname is not useful. |
+| `synapsys.heartbeat-interval` | `5s` | Positive whole seconds between heartbeats. |
+| `synapsys.fail-fast` | `false` | Fail startup if Core is unavailable instead of continuing to retry. |
+| `synapsys.connect-timeout` | `2s` | HTTP connection timeout. |
+| `synapsys.request-timeout` | `5s` | Whole heartbeat request timeout. |
 
-## `fail-fast`
+Unknown `synapsys.*` properties fail startup. This is deliberate: a misspelled
+timeout or URL should not silently leave a worker on an unexpected default.
 
-Left `false`, an application whose Core is unreachable still starts, still runs
-its processes, and keeps retrying the heartbeat in the background. Set it `true`
-only when a worker is worthless without the Core — most are not.
+## Environment patterns
+
+Use the same artifact in every environment and change only injected values:
+
+```yaml title="application-test.yaml"
+synapsys:
+  enabled: false
+```
+
+For production, use a distinct named worker token per service or trust boundary.
+Rotate it by creating a replacement in Core **Settings**, update the deployment,
+confirm `last used` on the new token, then revoke the old one.
+
+## Availability behaviour
+
+With the default `fail-fast: false`, an unavailable Core does not prevent the host
+application from starting and does not stop work already running. The heartbeat
+continues retrying. Use `true` only when joining Core is a hard requirement for that
+deployment.
+
+Next: [define process types and understand log capture](./processes-and-logs).

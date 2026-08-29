@@ -1,65 +1,76 @@
 ---
-title: Architecture
-description: The Core, workers, processes and executions, and how they relate.
+title: System model
+description: Learn how Core, workers, processes, executions, and actions fit together.
 sidebar_position: 1
 ---
 
-# Architecture
+# System model
 
-Synapsys has one central node and any number of workers. Everything flows in one
-direction: workers call the Core, never the reverse.
+Synapsys has one Core and any number of workers. Operators use Core; applications
+connect to it as workers. Every network connection from a worker is outbound.
 
 ```mermaid
 flowchart LR
-    W1["billing-jobs"] -->|heartbeat| C
-    W2["etl-runner"] -->|heartbeat| C
-    W3["scrape-fleet"] -->|heartbeat| C
-    C[("Core / nucleus")]
-    C -.->|desiredState + token| W1
-    O["Operator"] -->|start / stop| C
+    O([Operators]):::person
+    C["Synapsys Core<br/>console + control plane"]:::core
+    W["Your worker applications<br/>Spring Boot · Node.js · Raw API"]:::worker
+
+    O -->|use the HTTPS console| C
+    W -->|send outbound heartbeats| C
+
+    classDef person fill:#EEEAFB,stroke:#795FF5,color:#21184F,stroke-width:2px
+    classDef core fill:#5F3DF2,stroke:#3F27B8,color:#FFFFFF,stroke-width:2px
+    classDef worker fill:#DDF7F2,stroke:#12A28F,color:#103F38,stroke-width:2px
 ```
 
-The dashed arrow is not a second connection. It is the response body of the
-heartbeat the worker itself opened.
+The command travels back in the HTTP response to the heartbeat. It is not a second
+connection, callback, or inbound request to the worker.
 
-## The four entities
+## A command round trip
 
-**Core** — the central node. Holds every worker, process and execution record,
-serves the console, and is the only component with a database.
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Operator
+    participant Core
+    participant Worker as Worker application
 
-**Worker** (*neuron*) — one of your applications. Identified by `workerName`,
-which must be stable across restarts; that is how the Core recognises a returning
-worker rather than inventing a new one.
-
-**Process** — a unit of work inside a worker. Names are unique **per worker**, not
-globally, so two workers may both have a `nightly-sync`. Because of that,
-processes are addressed by id, not by name:
-
+    Operator->>Core: Choose Start or Stop
+    Note over Core: Store command with a new token
+    Worker->>Core: POST heartbeat (state, ack token, logs)
+    Core-->>Worker: 200 OK (desired state, desired token)
+    Note over Worker: Apply only when desired token is newer
+    Worker->>Core: Next heartbeat acknowledges the token
 ```
-PUT /api/processes/{id}/desired-state
-```
 
-**Execution** — one run of a process. Carries a `runId` while it is in flight.
+The worker opens both heartbeat connections. Core only answers them.
 
-## Why workers never listen
+## Core
 
-A worker opens no port, which means:
+Core serves the responsive operator console and control API. It records the latest
+worker state, process state, execution history, actions, worker-token metadata, and
+captured output.
 
-- no inbound firewall rule, no ingress, no reverse proxy
-- workers can live behind NAT, on a laptop, in a locked-down VPC
-- the Core needs no credentials for, or network route to, anything it manages
+## Worker
 
-The cost is latency. A command is picked up on the next heartbeat, so with the
-default 5-second interval a start takes up to 5 seconds to be seen. For starting
-and stopping background jobs that is a trade worth making.
+A worker is one application connected through a starter, SDK, or the Raw API. Its
+name is its identity across restarts. The same worker sends every registered process
+on each heartbeat.
 
-## Two kinds of process
+## Process
 
-**Endless** — runs until stopped. Gets its own daemon thread and cooperates with a
-stop signal.
+A process is a named unit of work inside a worker. Names are unique within a worker,
+so two applications may both expose `nightly-sync` without colliding. A process is
+either endless or progressive and reports `idle`, `running`, `stopping`, or `failed`.
 
-**Progressive** — runs to completion. Gets a dedicated single-thread executor and
-is cancelled by interrupting it; it must check for cancellation at safe points.
+## Execution and action
 
-The distinction is not cosmetic: it decides how the process is scheduled, how it
-is stopped, and whether reaching `idle` means "finished" or "was stopped".
+An execution is one run of a process. Its output is viewed independently from other
+runs. An action records a control event such as a start, stop, heartbeat, or command
+acknowledgement, providing an operational history of how state changed.
+
+## Connectivity consequence
+
+Workers need outbound HTTPS access to Core but no inbound listener. With a five-
+second heartbeat interval, a command is normally observed within up to five seconds.
+Choose an interval that balances response time and request volume for your fleet.

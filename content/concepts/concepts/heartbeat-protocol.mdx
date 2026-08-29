@@ -1,6 +1,6 @@
 ---
 title: Heartbeat protocol
-description: The single outbound call that carries every report and every command between a worker and the Core.
+description: Understand the authenticated outbound call that reports state, carries logs, and delivers idempotent commands.
 sidebar_position: 2
 ---
 
@@ -9,44 +9,47 @@ import TabItem from '@theme/TabItem';
 
 # Heartbeat protocol
 
-A worker holds no open port. Every few seconds it posts the state of each process
-it owns to a single endpoint, and the Core replies with what it wants those
-processes to be doing. That is the entire contract — there is no second call, no
-callback, and no connection from the Core back to the worker.
+Every few seconds a worker posts a complete process snapshot to one authenticated
+endpoint. Core records the snapshot and returns the latest desired state and command
+token. The response travels on the same connection; Core never calls the worker.
 
-## The loop
-
-```
+```text
 POST {coreUrl}/api/v1/workers/heartbeat
+Authorization: Bearer <worker-token>
 ```
-
-The worker sends every process it knows about in one batch. The Core answers with
-a desired state for each.
 
 <Tabs groupId="connection">
 <TabItem value="spring-boot" label="Spring Boot">
 
-The starter runs this loop for you. You configure the interval and never call the
-endpoint yourself:
-
-```yaml title="application.yaml"
+```yaml
 synapsys:
-  core-url: http://localhost:8080
-  worker-name: billing-jobs
+  core-url: ${SYNAPSYS_CORE_URL}
+  core-token: ${SYNAPSYS_CORE_TOKEN}
   heartbeat-interval: 5s
 ```
+
+The starter builds, sends, and applies the heartbeat automatically.
+
+</TabItem>
+<TabItem value="nodejs" label="Node.js">
+
+```js
+const synapsys = new Synapsys({
+  workerName: 'billing-api',
+  heartbeatInterval: '5s',
+});
+synapsys.start();
+```
+
+The SDK reads `SYNAPSYS_CORE_URL` and `SYNAPSYS_CORE_TOKEN` by default.
 
 </TabItem>
 <TabItem value="raw-api" label="Raw API">
 
-```http
-POST /api/v1/workers/heartbeat HTTP/1.1
-Host: localhost:8080
-Content-Type: application/json
-
+```json
 {
-  "workerName": "billing-jobs",
-  "framework": "custom",
+  "workerName": "billing-api",
+  "framework": "unknown",
   "host": "worker-01",
   "heartbeatInterval": 5,
   "processes": [
@@ -54,83 +57,52 @@ Content-Type: application/json
       "name": "nightly-sync",
       "type": "endless",
       "currentState": "running",
-      "ackToken": 7
+      "ackToken": 7,
+      "runId": 1788012345678901234
     }
-  ]
+  ],
+  "logs": []
 }
 ```
 
-Response:
-
-```json
-{
-  "processes": [
-    {
-      "name": "nightly-sync",
-      "desiredState": "stopping",
-      "desiredToken": 8
-    }
-  ]
-}
-```
-
-`heartbeatInterval` is in **positive whole seconds**, as an integer.
+See the [implementation guide](/manuals/raw-api/the-heartbeat-loop) for the complete
+request and response behaviour.
 
 </TabItem>
 </Tabs>
 
-## Commands are matched by token, not by state
+## Commands use tokens
 
-The obvious design — compare `desiredState` against `currentState` and act on the
-difference — replays the command on every beat until the state catches up. A
-process that takes thirty seconds to stop would receive six stop commands.
+Comparing only desired and current state would replay a slow stop command on every
+heartbeat. Instead, Core increments `desiredToken` whenever an operator issues a
+command. The worker applies it exactly once:
 
-So the Core does not ask "are these states different?". It increments a
-**`desiredToken`** every time a user issues a command, and the worker acts only
-when that token is newer than the one it last acknowledged.
-
-```
-if (desiredToken > ackToken) {
-    apply(desiredState);
-    ackToken = desiredToken;
-}
+```text
+if desiredToken > ackToken:
+    apply desiredState
+    ackToken = desiredToken
 ```
 
-The worker reports its `ackToken` on the next heartbeat. Core clears an
-acknowledged start immediately. It clears an acknowledged stop after the worker
-also reports a terminal state (`idle` or `failed`). In both cases it resets
-`desiredState` to `idle`.
+Advance the acknowledgement only after handling succeeds. A failed handler leaves
+the token pending so Core can redeliver it.
 
 :::caution
-A `desiredState` of `idle` means **"no command"**, never "stop". Stop is
-`stopping`. A client that treats `idle` as an instruction will shut down every
-process it owns on the first heartbeat after a command completes.
+`desiredState: idle` means “no outstanding command,” never “stop.” A stop command is
+`stopping`.
 :::
 
-## What each side is responsible for
+## State and logs travel together
 
-| | The worker | The Core |
-|---|---|---|
-| Opens the connection | always | never |
-| Reports `currentState` | yes | — |
-| Reports `ackToken` | yes | — |
-| Issues `desiredState` | — | yes |
-| Increments `desiredToken` | — | on each user command |
-| Clears a completed start | — | once `ackToken >= desiredToken` |
-| Clears a completed stop | — | once acknowledged and terminal |
+The request reports every process, including idle ones. It can also include stdout
+and stderr lines captured since the previous successful heartbeat. Each line belongs
+to a process and run. If delivery fails, official libraries keep the lines for a
+later retry.
 
-## One bad process does not fail the batch
+## Failure is isolated
 
-If a worker sends ten processes and one of them is unreadable — an unknown state,
-a missing name — the Core keeps the nine it understands and drops the one it does
-not. The heartbeat is rejected only when nothing in it is readable.
+An unavailable Core does not stop user work. The worker keeps running and retries.
+A malformed process or log entry is skipped individually when possible so valid
+siblings and pending commands can still be processed.
 
-This is what keeps an older Core forward-compatible with a newer client: a field
-it does not recognise costs one process, not the whole worker.
-
-## Next
-
-- [Execution states](./execution-states) — what `currentState` can be, and which
-  of those the Core is allowed to ask for
-- [Raw API: the heartbeat loop](/manuals/raw-api/the-heartbeat-loop) — the same
-  protocol as an implementation guide
+Next: [execution states](./execution-states) and
+[security and connectivity](./security-and-connectivity).

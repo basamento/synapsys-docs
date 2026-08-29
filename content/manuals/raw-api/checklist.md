@@ -1,82 +1,64 @@
 ---
 title: Client checklist
-description: Everything a correct Synapsys client must do, in order.
-sidebar_position: 3
+description: Production checklist for a correct, secure, and resilient Synapsys heartbeat client.
 ---
 
 # Client checklist
 
-Everything a correct client must do. Nothing else is on this page on purpose —
-if you are implementing Synapsys in a runtime with no starter, this is the list
-to work through and then test against.
+Use this list before calling a custom heartbeat client production-ready.
 
-## Registration
+## Identity and authentication
 
-- [ ] Send a `workerName`. If it is absent the Core cannot identify you across
-      restarts.
-- [ ] Send a `framework` string identifying your runtime. If you do not, the Core
-      records `unknown` — it never guesses `springboot` or anything else.
-- [ ] Send a `host`. If you omit it the Core falls back to the TCP remote address,
-      which is usually a container IP and usually useless.
-- [ ] Send `heartbeatInterval` as a **positive integer number of seconds**,
-      matching the interval you actually use.
+- [ ] The worker name is stable across restarts.
+- [ ] Process names are non-empty and unique within that worker.
+- [ ] Every heartbeat sends `Authorization: Bearer <token>`.
+- [ ] The token comes from a secret mechanism and never appears in logs or URLs.
+- [ ] The Core URL uses HTTPS outside isolated local development.
+- [ ] Redirects do not forward the bearer token to another host.
 
-## The loop
+## Heartbeat
 
-- [ ] POST to `{coreUrl}/api/v1/workers/heartbeat` on a fixed interval.
-- [ ] Send **every** process you own in one batch, on every beat — not just the
-      ones that changed.
-- [ ] Include `name`, `type` (`endless` or `progressive`), `currentState`, and
-      `ackToken` for each.
-- [ ] Keep beating while processes are idle. Silence is how the Core decides a
-      worker is gone.
-- [ ] Never open an inbound port. Nothing calls you.
+- [ ] Send `POST /api/v1/workers/heartbeat` on a positive whole-second interval.
+- [ ] Send every process on every beat, including idle processes.
+- [ ] Report `workerName`, `framework`, `heartbeatInterval`, and `processes`.
+- [ ] Apply connection and whole-request timeouts.
+- [ ] Catch every error at the loop boundary so one exception cannot kill it.
+- [ ] Ignore unknown response fields for forward compatibility.
+- [ ] Core being unavailable does not stop running user work.
 
-## Applying a command
+## Commands and state
 
-- [ ] Compare the response's `desiredToken` against your stored `ackToken` for
-      that process.
-- [ ] Apply the command **only** when `desiredToken > ackToken`. Equal or lower is
-      a duplicate and must be ignored.
-- [ ] Set `ackToken = desiredToken` **after your local command handler accepts
-      the command**, not before.
-- [ ] Report the new `ackToken` on the next beat.
-- [ ] Treat `desiredState: "idle"` as **no command**. It is not a stop.
-- [ ] Reject `failed` as a desired state — it is observable only.
-- [ ] Carry `runId` back unchanged when the Core sends one.
-
-## States
-
-- [ ] Report exactly one of `idle`, `running`, `stopping`, `failed`.
-- [ ] Report `stopping` while a stop is in progress, not `idle`, and not
-      `running`.
-- [ ] Report `failed` when a process terminated abnormally, and leave it there
-      until a new command arrives.
-- [ ] Omit a process you cannot determine the state of, rather than guessing.
+- [ ] Apply a command only when `desiredToken > ackToken`.
+- [ ] Acknowledge only after the handler completes successfully.
+- [ ] `running` starts, `stopping` requests a cooperative stop, and `idle` means no command.
+- [ ] `failed` is reportable but never accepted as a desired state.
+- [ ] One process failure cannot block another process's command.
+- [ ] Duplicate start commands cannot create duplicate runs.
+- [ ] Preserve and echo `runId` exactly as an opaque 64-bit value.
 
 ## Process types
 
-- [ ] **Endless** — runs until told to stop. Must poll a stop signal cooperatively
-      and return promptly once it is set.
-- [ ] **Progressive** — runs to completion on its own. Must check for cancellation
-      at safe points, and reaches `idle` by finishing.
+- [ ] Endless bodies keep running until they observe a stop request.
+- [ ] Progressive bodies run once and return to `idle` when complete.
+- [ ] Progressive work has explicit cancellation points for long loops or I/O.
+- [ ] Cleanup failure does not prevent the process from stopping.
 
-## Robustness
+## Logs
 
-- [ ] Set a connect timeout and a request timeout. A hung Core must not stall your
-      loop.
-- [ ] Survive the Core being unreachable — keep running, keep retrying, do not
-      stop processes because a heartbeat failed.
-- [ ] Keep beating with the same `ackToken` values across a Core restart. Command
-      state lives in the Core's database, not in the connection.
-- [ ] Tolerate unknown fields in the response. Newer Cores will add them.
+- [ ] Capture only output produced inside a process execution.
+- [ ] Continue writing every captured line to the application's normal output.
+- [ ] Attach the process name, exact `runId`, timestamp, source, level, and sequence.
+- [ ] Drop blank lines and never send a null run id or sequence below one.
+- [ ] Bound line length, queue length, and bytes per heartbeat.
+- [ ] Requeue drained lines when the heartbeat fails.
+- [ ] Make capture disableable and document that output is transmitted to Core.
 
 ## Test it
 
-- [ ] Issue the same command twice — the process must act once.
-- [ ] Stop a process that takes longer than one interval to stop — it must not
-      receive a second stop.
-- [ ] Kill the Core mid-command, restart it — the worker must converge without
-      replaying.
-- [ ] Send a batch with one malformed process — the others must still be
-      accepted.
+- [ ] Start while Core is unavailable, then confirm the worker connects when Core returns.
+- [ ] Interrupt a heartbeat and confirm the loop continues.
+- [ ] Repeat a command response and confirm it is not applied twice.
+- [ ] Crash one process and confirm other processes still receive commands.
+- [ ] Stop a sleeping or in-flight process and confirm it exits cooperatively.
+- [ ] Send concurrent process output and confirm lines remain attached to the right run.
+- [ ] Revoke the token and confirm the next heartbeat receives `401`.

@@ -38,23 +38,34 @@ Stop is `stopping`. Nothing else is.
 
 ## The lifecycle
 
-```
-        ┌──────────────── stop completes ─────────────────┐
-        │                                                 │
-        ▼                                                 │
-     ┌──────┐   start command    ┌─────────┐   stop command   ┌──────────┐
-     │ idle │ ─────────────────► │ running │ ───────────────► │ stopping │
-     └──────┘                    └─────────┘                  └──────────┘
-                                      │                             │
-                                      │  unhandled error            │
-                                      ▼                             │
-                                 ┌────────┐                         │
-                                 │ failed │ ◄───────────────────────┘
-                                 └────────┘
+```mermaid
+flowchart TB
+    I([idle]):::idle -->|start applied| R([running]):::running
+    R -->|progressive run completes| ID([idle]):::idle
+    R -->|stop applied| S([stopping]):::stopping
+    S -->|body exits| ID
+    R -->|unhandled error| F([failed]):::failed
+    S -->|error while stopping| F
+    F -->|start again| NR([running<br/>new execution]):::running
+
+    classDef idle fill:#EEEAFB,stroke:#8E7DE8,color:#251B54,stroke-width:2px
+    classDef running fill:#DDF7F2,stroke:#12A28F,color:#103F38,stroke-width:2px
+    classDef stopping fill:#FFF1CC,stroke:#D89414,color:#5A3A00,stroke-width:2px
+    classDef failed fill:#FDE1DE,stroke:#D9544D,color:#5B1714,stroke-width:2px
 ```
 
 A progressive process also reaches `idle` on its own, by finishing — no stop
-command is involved.
+command is involved. A failed process can be started again, which creates a new
+execution. The repeated `idle` and `running` nodes keep the reading direction clear;
+they represent the same states.
+
+:::note[Desired state is not current state]
+
+The arrows describe what the worker actually reports. After a command is
+acknowledged, Core may show desired state `idle` to mean “nothing is pending” while
+the current state remains `running`.
+
+:::
 
 ## Reporting a state you cannot determine
 

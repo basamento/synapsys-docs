@@ -1,6 +1,6 @@
 ---
 title: 1. Hello worker
-description: Register an application with the Core and watch it appear.
+description: Connect a Spring Boot or Node.js application to Core and verify its first authenticated heartbeat.
 sidebar_position: 1
 ---
 
@@ -9,17 +9,23 @@ import TabItem from '@theme/TabItem';
 
 # 1. Hello worker
 
-The smallest useful thing: an application that introduces itself to the Core and
-keeps saying it is alive. No processes yet.
+In this tutorial, an application authenticates to Core, reports its identity, and
+appears in the Workers view. You need a [running Core](/docs/start/run-the-core)
+and a worker token.
 
-You need a Core running — see [Run the Core](/docs/start/run-the-core).
+## Set the connection values
 
-## Connect
+Provide these values through your shell, service manager, or secret store:
+
+```dotenv
+SYNAPSYS_CORE_URL=http://localhost:8080
+SYNAPSYS_CORE_TOKEN=replace-with-your-worker-token
+```
 
 <Tabs groupId="connection">
 <TabItem value="spring-boot" label="Spring Boot">
 
-Add the starter, then:
+Add the [Maven Central dependency](/manuals/spring-boot/install), then configure:
 
 ```yaml title="application.yaml"
 spring:
@@ -27,42 +33,52 @@ spring:
     name: hello-worker
 
 synapsys:
-  core-url: http://localhost:8080
+  core-url: ${SYNAPSYS_CORE_URL}
+  core-token: ${SYNAPSYS_CORE_TOKEN}
 ```
 
-Start the application. That is all — the starter begins heartbeating on boot.
+Start the application. The starter owns the heartbeat lifecycle.
+
+</TabItem>
+<TabItem value="nodejs" label="Node.js">
+
+Install `@synapsys-io/sdk`, then:
+
+```js title="app.js"
+const { Synapsys } = require('@synapsys-io/sdk');
+
+const synapsys = new Synapsys({ workerName: 'hello-worker' });
+synapsys.start();
+```
+
+Run `node app.js`. The SDK reads the Core URL and token from the environment.
 
 </TabItem>
 <TabItem value="raw-api" label="Raw API">
 
-```bash
-BODY='{"workerName":"hello-worker","framework":"curl","host":"laptop","heartbeatInterval":5,"processes":[]}'
+Send a single authenticated heartbeat:
 
-while true; do
-  curl -s -X POST http://localhost:8080/api/v1/workers/heartbeat \\
-       -H 'Content-Type: application/json' -d "$BODY"
-  sleep 5
-done
+```bash
+curl --request POST 'http://localhost:8080/api/v1/workers/heartbeat' \
+  --header "Authorization: Bearer ${SYNAPSYS_CORE_TOKEN}" \
+  --header 'Content-Type: application/json' \
+  --data '{"workerName":"hello-worker","framework":"unknown","heartbeatInterval":5,"processes":[]}'
 ```
 
-An empty `processes` array is valid. A worker with no processes is still a worker.
+An empty `processes` array is valid. A real client repeats the request on the stated
+interval; see [the Raw API loop](/manuals/raw-api/the-heartbeat-loop).
 
 </TabItem>
 </Tabs>
 
-## What you should see
+## Verify it
 
-Open http://localhost:8080. Within five seconds `hello-worker` appears, marked
-active, with no processes.
+Sign in to Core and open **Workers**. `hello-worker` should appear after the first
+successful heartbeat. Stop the application and it becomes inactive after Core no
+longer receives its heartbeat.
 
-Stop the application — or press Ctrl-C on the loop — and the worker goes inactive
-shortly after. Nothing told the Core it was leaving; it simply stopped hearing
-from it.
+There was no registration request: the authenticated heartbeat both introduces and
+renews the worker. Keep `workerName` stable across restarts so Core recognises the
+same application.
 
-## What just happened
-
-There was no registration step. The first heartbeat created the worker, and every
-heartbeat after it renewed the liveness. This is why `workerName` must be stable:
-change it and the Core sees a different worker, not the same one renamed.
-
-Next: [an endless process](./endless-process).
+Next: [add an endless process](./endless-process).

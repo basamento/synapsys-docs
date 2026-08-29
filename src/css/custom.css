@@ -422,7 +422,8 @@ div[class^='codeBlockTitle'] {
   border-radius: var(--syn-radius-md);
   border-collapse: separate;
   border-spacing: 0;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 /* -----------------------------------------------------------------------------
@@ -468,4 +469,65 @@ div[class^='codeBlockTitle'] {
   color: var(--syn-link);
   font-weight: 600;
   border-bottom: 2px solid var(--syn-link);
+}
+
+/* -----------------------------------------------------------------------------
+   Tutorial landing cards — a task-oriented entry point rather than another list.
+   -------------------------------------------------------------------------- */
+.tutorial-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--syn-space-4);
+  margin: var(--syn-space-6) 0 var(--syn-space-8);
+}
+
+.tutorial-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--syn-space-2);
+  padding: var(--syn-space-5);
+  color: var(--syn-text-body);
+  background: var(--syn-surface-raised);
+  border: 1px solid var(--syn-border);
+  border-radius: var(--syn-radius-lg);
+  text-decoration: none;
+  transition: transform 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.tutorial-card:hover {
+  color: var(--syn-text-body);
+  border-color: var(--syn-brand-300);
+  box-shadow: var(--syn-shadow-sm);
+  text-decoration: none;
+  transform: translateY(-2px);
+}
+
+.tutorial-card strong {
+  font-family: var(--syn-font-display);
+  font-size: 1.08rem;
+  letter-spacing: -0.015em;
+}
+
+.tutorial-card > span:last-child {
+  color: var(--syn-text-secondary);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+.tutorial-card__step {
+  font-family: var(--syn-font-mono);
+  color: var(--syn-link);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 640px) {
+  .tutorial-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tutorial-card {
+    min-height: var(--syn-tap-min);
+  }
 }

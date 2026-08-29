@@ -1,41 +1,43 @@
 ---
 title: Overview
-description: Speaking the Synapsys protocol directly, with no starter.
-sidebar_position: 1
+description: Integrate any runtime with Synapsys through the supported heartbeat HTTP API.
 ---
 
 # Raw API
 
-Raw API is a supported way to connect to Synapsys, on the same footing as the
-Spring Boot starter. It is what you use when your runtime has no starter — and
-also the fastest way to understand what a starter is doing on your behalf.
+The Raw API is the supported integration for a runtime without an official library.
+A worker sends one authenticated JSON request on a fixed interval. The request
+reports every process and any new output; the response carries the latest command
+and token for each process.
 
-## What you are implementing
+## What you implement
 
-One endpoint, called on a timer:
+Your client owns one loop:
 
-```
-POST {coreUrl}/api/v1/workers/heartbeat
-```
+1. Build a complete snapshot of every registered process.
+2. Add captured log lines produced since the previous successful heartbeat.
+3. `POST /api/v1/workers/heartbeat` with a worker bearer token.
+4. Compare each returned `desiredToken` with the process's `ackToken`.
+5. Apply only newer commands and acknowledge after handling succeeds.
+6. Retry indefinitely without stopping user work when Core is unavailable.
 
-There is nothing else. No registration call, no authentication handshake, no
-websocket, no callback. A correct client is a loop, a JSON document, and a
-comparison between two integers.
+There is no registration endpoint and Core never calls the worker. The first valid
+heartbeat creates the worker and its processes in Core.
 
 ## What you need
 
-- An HTTP client
-- A JSON encoder
-- A timer
-- Somewhere to keep one integer per process (`ackToken`)
+- A stable worker name and stable process names.
+- A Core URL reachable from the worker.
+- A token created in Core **Settings** or configured as Core's deployment token.
+- A scheduler or loop with request timeouts.
+- Isolated process state and a durable in-memory acknowledgement token per process.
 
-## Read in this order
+## Use a library when one exists
 
-1. [The heartbeat loop](./the-heartbeat-loop) — the request, the response, and
-   what to do with it
-2. [Client checklist](./checklist) — everything a correct client must do, as a
-   flat list to work through
+The [Spring Boot starter](/manuals/spring-boot/install) and
+[Node.js SDK](/manuals/nodejs/install) already implement retries, idempotent command
+handling, cancellation, and log capture. Use the Raw API when you need a different
+runtime or want to build an integration with equivalent behaviour.
 
-The [protocol concept page](/docs/concepts/heartbeat-protocol) explains *why* the
-design is shaped this way. This manual assumes you have decided to implement it
-and want the details.
+Continue with [the heartbeat loop](./the-heartbeat-loop), then use the
+[client checklist](./checklist) before production.

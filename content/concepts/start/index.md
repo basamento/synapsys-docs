@@ -1,40 +1,56 @@
 ---
 title: What Synapsys is
-description: What the product does, what it deliberately does not do, and who it is for.
-sidebar_position: 1
+description: Understand the operational problem Synapsys solves and whether it fits your system.
 slug: /start
 ---
 
 # What Synapsys is
 
-Most companies do not know what is running where. A cron job on a server someone
-left. A Python script on a laptop. A Spring service nobody restarts because they
-are not sure what depends on it.
+Synapsys is a self-hosted control plane for background work that already lives in
+your applications and scripts. It gives teams one place to see what is running,
+start or stop it, inspect execution history, and read its output—without rewriting
+the work as a new job system.
 
-Synapsys gives all of them one place to be registered, started, stopped and
-accounted for — whatever language they are written in, whatever machine they sit
-on.
+## The problem it solves
+
+Companies accumulate operational programs in many places: a poller inside a Spring
+service, a Node.js import script, a long-running consumer, or a one-off maintenance
+task. These programs may work well, but operating them becomes difficult:
+
+- ownership and runtime location are unclear;
+- starting or stopping work requires shell access or a deployment;
+- teams cannot quickly tell whether work is idle, running, stopping, or failed;
+- execution output is scattered across hosts and logging systems.
+
+Synapsys adds a thin control layer around that existing code. The code remains in
+its application and keeps using its own dependencies. A small library reports its
+state to Synapsys Core and applies operator commands.
 
 ## The model
 
-- A **Core** is the central node. One binary, one database, one console.
-- A **worker** (a *neuron*) is one of your applications. It connects out to the
-  Core and never accepts inbound connections.
-- A **process** is a unit of work inside a worker — a job, a loop, a task.
-- An **execution** is one run of a process, with a start, an end and an outcome.
+1. Run **Core**, which serves the operator console and control API.
+2. Add a **starter or SDK** to an application. That application becomes a worker.
+3. Register existing functions or classes as **processes**.
+4. The worker sends an outbound heartbeat. Core returns any pending command.
+5. Operators use the console to start, stop, inspect, and troubleshoot executions.
 
-## What it does not do
+The console is designed for desktop, tablet, and mobile browsers, so an operator can
+check status and navigate the system away from a workstation.
 
-- **It does not run your code.** Your process stays in your application, on your
-  machine, with your dependencies. Synapsys starts and stops it; it does not host
-  it.
-- **It is not a scheduler.** There is no cron syntax. If you need a schedule, your
-  process owns it.
-- **It is not a queue.** Nothing is distributed to workers. A process belongs to
-  exactly one worker.
+## What it does not replace
 
-## Where to go next
+Synapsys is not a message broker, workflow engine, container orchestrator, or
+scheduler. It does not move your business logic into Core and it does not require
+workers to expose inbound ports. Use it when the work already belongs in your
+application but needs a consistent operational surface.
 
-1. [Run the Core](/docs/start/run-the-core) — one command
-2. [Your first worker](/docs/start/first-worker) — add the starter, watch it appear
-3. [Start and stop a process](/docs/start/start-and-stop) — drive it from the console
+## Choose an integration
+
+| Your application | Start here |
+| --- | --- |
+| Spring Boot 3.x on Java 17+ | [Spring Boot starter](/manuals/spring-boot/install) |
+| Node.js 16+, CommonJS or ESM | [Node.js SDK](/manuals/nodejs/install) |
+| Another runtime | [Raw HTTP API](/manuals/raw-api/overview) |
+
+Ready to try it? [Run Core](/docs/start/run-the-core), then connect your first
+worker.

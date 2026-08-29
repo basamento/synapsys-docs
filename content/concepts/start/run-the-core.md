@@ -1,46 +1,71 @@
 ---
 title: Run the Core
-description: Build and run the Core, with its console compiled in.
-sidebar_position: 2
+description: Start Synapsys Core from its GitHub Container Registry image with safe bootstrap credentials.
 ---
 
 # Run the Core
 
-The Core ships as a single Go binary with its web console compiled into it. There
-is no separate frontend to deploy and no external database to provision.
+Core is distributed as a container at `ghcr.io/jmarzoli/synapsys-core`. It serves
+the web console and API on port `8080`, and stores its state in a persistent volume.
 
-:::info Early development image
-The Core image is private and pre-1.0. Authenticate to GitHub Container Registry
-and use an explicit version tag such as `0.1.0` or `0.1.0-alpha.1`.
+## 1. Create bootstrap secrets
+
+Create a file named `synapsys.env` outside source control:
+
+```dotenv title="synapsys.env"
+SYNAPSYS_AUTH_USERNAME=operator
+SYNAPSYS_AUTH_PASSWORD=replace-with-a-long-random-password
+```
+
+These values create the initial console account when Core starts with an empty data
+volume. Worker access is configured separately after signing in.
+
+:::tip Generate secrets instead of inventing them
+Password managers are ideal. On a machine with OpenSSL, `openssl rand -base64 32`
+produces a suitable random password.
 :::
 
-## With Docker
+## 2. Start the container
 
 ```bash
-docker login ghcr.io
-docker pull ghcr.io/jmarzoli/synapsys-core:0.1.0
+docker pull ghcr.io/jmarzoli/synapsys-core:latest
+
+docker run -d \
+  --name synapsys-core \
+  --restart unless-stopped \
+  --env-file synapsys.env \
+  -p 8080:8080 \
+  -v synapsys-data:/app/data \
+  ghcr.io/jmarzoli/synapsys-core:latest
 ```
 
-```bash
-docker run -p 8080:8080 -v synapsys-data:/app/data ghcr.io/jmarzoli/synapsys-core:0.1.0
-```
+Open `http://localhost:8080` and sign in with the operator credentials from the
+environment file.
 
-The console is now at **http://localhost:8080**.
+Open **Settings**, create a named worker token, and store the displayed value in the
+worker as `SYNAPSYS_CORE_TOKEN`. The operator password is never used by a worker.
 
-The volume matters: the Core keeps its state in a SQLite database at
-`/app/data/nucleus.db`. Without a volume, every worker, process and execution
-record is lost when the container is replaced.
-
-## Checking it is up
+## 3. Check availability
 
 ```bash
 curl http://localhost:8080/api/health
 ```
 
-## What you have now
+The expected response is:
 
-An empty Core. It knows about nothing, because nothing has connected to it yet —
-workers introduce themselves by heartbeating, not by being registered ahead of
-time.
+```json
+{"status":"ok"}
+```
 
-Next: [your first worker](./first-worker).
+## What persists
+
+The `synapsys-data` volume contains Core state and the initial account. Bootstrap
+credentials initialise an empty volume; changing the environment variables later
+does not replace the persisted password.
+
+For a production deployment, use HTTPS, set
+`SYNAPSYS_AUTH_COOKIE_SECURE=true`, keep the volume backed up, and supply secrets
+through your platform's secret mechanism. See [Core authentication](/manuals/core/authentication)
+for named worker tokens and rotation.
+
+Next: [connect your first worker](/docs/start/first-worker).

@@ -23,6 +23,7 @@ const sidebars: SidebarsConfig = {
         'concepts/architecture',
         'concepts/heartbeat-protocol',
         'concepts/execution-states',
+        'concepts/security-and-connectivity',
       ],
     },
   ],

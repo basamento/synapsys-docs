@@ -116,6 +116,8 @@
   --syn-success: var(--syn-teal-on-light);
   --syn-warning: var(--syn-amber-on-light);
   --syn-danger:  var(--syn-red-on-light);
+  --syn-shadow-sm: 0 8px 24px rgb(23 18 58 / 8%);
+  --syn-shadow-lg: 0 20px 56px rgb(23 18 58 / 16%);
 }
 
 /* =============================================================================
@@ -145,6 +147,8 @@
   --syn-success: var(--syn-teal-on-dark);
   --syn-warning: var(--syn-amber-on-dark);
   --syn-danger:  var(--syn-red-on-dark);
+  --syn-shadow-sm: 0 8px 24px rgb(4 3 12 / 22%);
+  --syn-shadow-lg: 0 20px 56px rgb(4 3 12 / 42%);
 }
 
 /* =============================================================================

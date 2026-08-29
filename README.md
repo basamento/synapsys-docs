@@ -25,15 +25,18 @@ Requires Node 20 or later.
 ```
 content/
   concepts/      /docs        — Get started and Concepts (the default instance)
-  tutorials/     /tutorials   — numbered, cumulative, language-tabbed
+  tutorials/     /tutorials   — task-oriented developer and operator walkthroughs
   manuals/
     core/        /manuals/core
     spring-boot/ /manuals/spring-boot
+    nodejs/      /manuals/nodejs
     raw-api/     /manuals/raw-api
   reference/     /reference
 blog/                         — releases and design notes
 design/                       — the design system (see design/README.md)
 sidebars/                     — one file per docs instance
+static/img/screenshots/       — sanitized product captures and named placeholders
+src/components/               — shared content components, including screenshot frames
 src/pages/index.tsx           — the landing page
 ```
 
@@ -43,7 +46,7 @@ unversioned today — the system is v1 until the first public release — but th
 instances exist separately from day one so that turning versioning on never has
 to move a URL.
 
-Go and Python manuals are deliberately absent until those starters exist.
+Only shipped integrations have manuals: Spring Boot, Node.js, and the Raw API.
 
 ## Before you edit
 
@@ -54,6 +57,10 @@ are recorded there rather than being visible in the code:
   and the conventions (URL rules, the Raw API tab, what ships first).
 - **[design/README.md](./design/README.md)** — the visual system: colour, type,
   the dark-mode rule, logo usage, responsive breakpoints.
+
+`IA.md` also records the screenshot privacy, dimensions, naming, and replacement
+rules. Use the shared `ProductScreenshot` component instead of styling captures in
+individual pages.
 
 ## Things that will bite you
 

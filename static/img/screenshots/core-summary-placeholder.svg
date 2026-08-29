@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900">
+  <rect width="1440" height="900" fill="#0f0b24"/>
+  <rect x="0" y="0" width="240" height="900" fill="#17123a"/>
+  <circle cx="44" cy="48" r="18" fill="#5f3df2"/>
+  <rect x="76" y="36" width="112" height="24" rx="6" fill="#eeeafb" opacity=".9"/>
+  <g fill="#39305f">
+    <rect x="28" y="110" width="184" height="44" rx="9"/>
+    <rect x="28" y="166" width="184" height="44" rx="9"/>
+    <rect x="28" y="222" width="184" height="44" rx="9"/>
+    <rect x="28" y="278" width="184" height="44" rx="9"/>
+  </g>
+  <rect x="286" y="58" width="340" height="40" rx="8" fill="#eeeafb" opacity=".9"/>
+  <rect x="286" y="124" width="1060" height="162" rx="18" fill="#211a46" stroke="#39305f"/>
+  <g fill="#211a46" stroke="#39305f">
+    <rect x="286" y="322" width="330" height="210" rx="18"/>
+    <rect x="636" y="322" width="330" height="210" rx="18"/>
+    <rect x="986" y="322" width="360" height="210" rx="18"/>
+    <rect x="286" y="568" width="1060" height="244" rx="18"/>
+  </g>
+  <circle cx="450" cy="427" r="54" fill="#12b5a0" opacity=".8"/>
+  <rect x="686" y="382" width="230" height="20" rx="8" fill="#5f3df2"/>
+  <rect x="686" y="423" width="176" height="14" rx="7" fill="#8e7de8"/>
+  <rect x="686" y="457" width="204" height="14" rx="7" fill="#8e7de8" opacity=".6"/>
+  <text x="816" y="700" text-anchor="middle" fill="#c8c1ed" font-family="Arial, sans-serif" font-size="24">Core summary screenshot placeholder</text>
+  <text x="816" y="738" text-anchor="middle" fill="#8279ad" font-family="Arial, sans-serif" font-size="16">Replace this asset with a sanitized 1440 × 900 capture</text>
+</svg>

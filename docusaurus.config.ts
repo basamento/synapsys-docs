@@ -9,11 +9,12 @@ import { themes as prismThemes } from 'prism-react-renderer';
  * release); the instances exist separately from day one so that turning
  * versioning on later never has to move a URL.
  *
- * Go and Python manuals are deliberately absent until those starters exist.
- * IA.md §5: nothing is documented that is not implemented.
+ * Only shipped connection methods receive manuals. IA.md records the public
+ * product map and the versioning boundaries.
  */
 
 const GITHUB_ORG = 'JMarzoli';
+const SDK_GITHUB_ORG = 'basamento';
 
 const config: Config = {
   title: 'Synapsys',
@@ -126,6 +127,17 @@ const config: Config = {
     [
       '@docusaurus/plugin-content-docs',
       {
+        id: 'nodejs',
+        path: 'content/manuals/nodejs',
+        routeBasePath: 'manuals/nodejs',
+        sidebarPath: './sidebars/nodejs.ts',
+        editUrl: `https://github.com/${GITHUB_ORG}/synapsys-docs/tree/main/`,
+        showLastUpdateTime: true,
+      },
+    ],
+    [
+      '@docusaurus/plugin-content-docs',
+      {
         id: 'raw-api',
         path: 'content/manuals/raw-api',
         routeBasePath: 'manuals/raw-api',
@@ -165,7 +177,7 @@ const config: Config = {
       },
       items: [
         { to: '/docs/start', label: 'Docs', position: 'left' },
-        { to: '/tutorials/hello-worker', label: 'Tutorials', position: 'left' },
+        { to: '/tutorials/', label: 'Tutorials', position: 'left' },
         {
           type: 'dropdown',
           label: 'Manuals',
@@ -173,6 +185,7 @@ const config: Config = {
           items: [
             { to: '/manuals/core/install', label: 'Core' },
             { to: '/manuals/spring-boot/install', label: 'Spring Boot' },
+            { to: '/manuals/nodejs/install', label: 'Node.js' },
             { to: '/manuals/raw-api/overview', label: 'Raw API' },
           ],
         },
@@ -200,13 +213,14 @@ const config: Config = {
           items: [
             { label: 'Get started', to: '/docs/start' },
             { label: 'Concepts', to: '/docs/concepts/architecture' },
-            { label: 'Tutorials', to: '/tutorials/hello-worker' },
+            { label: 'Tutorials', to: '/tutorials/' },
           ],
         },
         {
           title: 'Connect',
           items: [
             { label: 'Spring Boot', to: '/manuals/spring-boot/install' },
+            { label: 'Node.js', to: '/manuals/nodejs/install' },
             { label: 'Raw API', to: '/manuals/raw-api/overview' },
           ],
         },
@@ -214,7 +228,8 @@ const config: Config = {
           title: 'Project',
           items: [
             { label: 'Core', href: `https://github.com/${GITHUB_ORG}/synapsys-core` },
-            { label: 'Spring Boot starter', href: `https://github.com/${GITHUB_ORG}/synapsys-springboot-starter` },
+            { label: 'Spring Boot starter', href: `https://github.com/${SDK_GITHUB_ORG}/synapsys-spring-boot-starter` },
+            { label: 'Node.js SDK', href: `https://github.com/${SDK_GITHUB_ORG}/synapsys-node-sdk` },
             { label: 'Blog', to: '/blog' },
           ],
         },
@@ -226,7 +241,7 @@ const config: Config = {
       // Code blocks are dark in both themes (design system, tokens.css).
       theme: prismThemes.palenight,
       darkTheme: prismThemes.palenight,
-      additionalLanguages: ['java', 'bash', 'json', 'yaml', 'python', 'go', 'properties'],
+      additionalLanguages: ['java', 'bash', 'json', 'yaml', 'javascript', 'typescript', 'properties'],
     },
 
     docs: {
