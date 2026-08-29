@@ -2,7 +2,10 @@ name: synapsys-docs
 
 services:
   docs:
-    image: ghcr.io/jmarzoli/synapsys-docs:${IMAGE_TAG:-latest}
+    image: synapsys-docs:local
+    build:
+      context: .
+      dockerfile: Dockerfile
     restart: unless-stopped
     read_only: true
     tmpfs:
