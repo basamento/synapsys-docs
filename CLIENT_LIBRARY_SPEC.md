@@ -75,7 +75,7 @@ each ecosystem's own vocabulary:
 | npm | `@synapsys-io/sdk` | the scope is `@synapsys-io`; on npm the ecosystem is implied, so it is not repeated in the name |
 | PyPI | `basamento-synapsys` | flat namespace; an unrelated `synapsys` package already exists |
 | Go | `github.com/basamento/synapsys-go-sdk` | the module path is the name; there is no registry |
-| NuGet | `Basamento.Synapsys.<Framework>` | prefix reservation applies |
+| NuGet | `Basamento.Synapsys` (core), `Basamento.Synapsys.Extensions.Hosting` (integration) | prefix reservation applies |
 
 **Do not use the word "starter" outside Spring.** In Node and Go it means
 "boilerplate you clone", which is the opposite of a dependency.
@@ -86,15 +86,15 @@ Every heartbeat carries a `framework` string telling Core which client is
 speaking. Lowercase, no spaces, no version:
 
 ```
-springboot   nodejs   python   go
+springboot   nodejs   python   go   dotnet
 ```
 
 **Core validates this field against a fixed set.** `WorkerFramework.Valid()` accepts
-`springboot`, `nodejs`, `python`, `go` and `unknown`, and coerces anything else to
+`springboot`, `nodejs`, `python`, `go`, `dotnet` and `unknown`, and coerces anything else to
 `unknown` — the exact failure this rule exists to prevent. A new library must have
 its identifier added to Core's enum, to the filter list in `collection.go`, and to
-the frontend card types, **before** the library ships. Until that is done, `dotnet`
-and `quarkus` are not usable values.
+the frontend card types, **before** the library ships. Until that is done,
+`quarkus` is not a usable value.
 
 Pick it once per library and never change it — Core stores it and operators
 filter on it. Never send `unknown`; that is Core's fallback for clients that omit
@@ -821,6 +821,8 @@ When a change affects more than one library:
 | 2026-08-28 | §4.2 new rule: **`runId` is an opaque int64** and must round-trip exactly. Found in the Node SDK, where JSON.parse rounded Core's 19-digit nanosecond id and every captured log line was then silently discarded by Core | all, especially JS/TS |
 | 2026-08-28 | Core no longer rejects a heartbeat for one unreadable `logs` entry: it skips the entry and applies the rest, as it already did for `processes`. §5's client rule is unchanged; its rationale is not | all |
 | 2026-08-29 | Core, its framework filter, and the console now recognize the `go` framework identifier | Go, Core |
+| 2026-08-30 | Added the .NET package identifiers and the `dotnet` framework identifier; Core, its framework filter, and the console recognize it | .NET, Core |
+| 2026-08-30 | Core startup now repairs legacy `worker_tokens` tables that predate `last_used_at` and `revoked_at`; without this, worker authentication, token listing, and revocation return errors after an upgrade | Core |
 | 2026-08-29 | §4 defines start-while-stopping as a deferred, unacknowledged command, preserving the active run id until the old run is terminal | all |
 | 2026-08-29 | §4.5 defines bounded cooperative shutdown followed by one best-effort final heartbeat whose response commands are ignored | all |
 | 2026-08-29 | §5 records Go's process-scoped `slog`/`io.Writer` capture contract and prohibits unsafe global stdout/stderr interception | Go |
@@ -871,9 +873,9 @@ Open, found while aligning the Node, Python and Spring libraries with this docum
 Open, found while writing the Node SDK:
 
 - **Core's `WorkerFramework` enum must be extended for each planned library.** Go
-  is now accepted end to end. `dotnet` and `quarkus` would still be recorded as
-  `unknown`; their enum, filter, and frontend values must be added before those
-  libraries ship.
+  and .NET are now accepted end to end. `quarkus` would still be recorded as
+  `unknown`; its enum, filter, and frontend values must be added before that
+  library ships.
 
 - **Core uses `time.Now().UnixNano()` as the `runId`.** It is unique and cheap, but
   it is also a 19-digit int64 that no IEEE-754 double can represent, which cost the
