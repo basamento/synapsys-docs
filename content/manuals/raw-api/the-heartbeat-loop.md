@@ -115,4 +115,5 @@ On application shutdown, stop the normal loop, request cooperative stops, and
 wait up to an application-defined bound. Then make one best-effort heartbeat with
 the final states and queued logs. Ignore commands in that response: shutdown must
 not start new work. A failure of this final request is diagnostic only and must
-not block or fail shutdown.
+not block or fail shutdown. Bound that request by
+`min(remaining shutdown budget, request timeout)`, and skip it when no time remains.

@@ -18,6 +18,7 @@ SYNAPSYS_WORKER_NAME=billing-api
 SYNAPSYS_HEARTBEAT_INTERVAL=5s
 SYNAPSYS_CONNECT_TIMEOUT=2s
 SYNAPSYS_REQUEST_TIMEOUT=5s
+SYNAPSYS_SHUTDOWN_TIMEOUT=10s
 SYNAPSYS_FAIL_FAST=false
 SYNAPSYS_CAPTURE_CONSOLE=true
 SYNAPSYS_LOG_LEVEL=info
@@ -39,6 +40,7 @@ load it before constructing `Synapsys`; the SDK does not read `.env` files itsel
 | `failFast` | `SYNAPSYS_FAIL_FAST` | `false` | Reject `start()` if Core is unavailable at startup. |
 | `connectTimeout` | `SYNAPSYS_CONNECT_TIMEOUT` | `2s` | Connection timeout. |
 | `requestTimeout` | `SYNAPSYS_REQUEST_TIMEOUT` | `5s` | Whole heartbeat timeout. |
+| `shutdownTimeout` | `SYNAPSYS_SHUTDOWN_TIMEOUT` | `10s` | Hard budget for cooperative process stop and the final heartbeat. |
 | `captureConsole` | `SYNAPSYS_CAPTURE_CONSOLE` | `true` | Stream process stdout/stderr to Core. |
 | `logLevel` | `SYNAPSYS_LOG_LEVEL` | `info` | `debug`, `info`, `warn`, `error`, or `silent`. |
 | `logger` | none | built-in | A pino-, winston-, bunyan-, or console-compatible logger. |
@@ -70,8 +72,12 @@ process.on('SIGTERM', async () => {
 });
 ```
 
-`stop()` is idempotent: it stops heartbeats, restores console streams, and asks
-running processes to stop.
+`stop()` is idempotent and non-throwing. It stops normal heartbeats, asks all
+running processes to stop, waits only within `shutdownTimeout`, sends one final
+best-effort heartbeat whose commands are ignored, then restores console streams and
+releases SDK-owned sockets. Pass a one-call override with
+`stop({ timeout: '30s' })`. A body that ignores cancellation is named, left alive,
+and prevented from overlapping a replacement run.
 
 ## Test and local profiles
 

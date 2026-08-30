@@ -26,6 +26,8 @@ synapsys:
   fail-fast: ${SYNAPSYS_FAIL_FAST:false}
   connect-timeout: ${SYNAPSYS_CONNECT_TIMEOUT:2s}
   request-timeout: ${SYNAPSYS_REQUEST_TIMEOUT:5s}
+  shutdown-timeout: ${SYNAPSYS_SHUTDOWN_TIMEOUT:10s}
+  capture-console: ${SYNAPSYS_CAPTURE_CONSOLE:true}
 ```
 
 Spring translates property names to uppercase underscore environment names. For a
@@ -49,6 +51,8 @@ SYNAPSYS_CORE_TOKEN=syn_replace_with_your_token
 | `synapsys.fail-fast` | `false` | Fail startup if Core is unavailable instead of continuing to retry. |
 | `synapsys.connect-timeout` | `2s` | HTTP connection timeout. |
 | `synapsys.request-timeout` | `5s` | Whole heartbeat request timeout. |
+| `synapsys.shutdown-timeout` | `10s` | Budget for stopping processes and attempting the final heartbeat. |
+| `synapsys.capture-console` | `true` | Tee process stdout/stderr to Core; `false` leaves global streams untouched. |
 
 Unknown `synapsys.*` properties fail startup. This is deliberate: a misspelled
 timeout or URL should not silently leave a worker on an unexpected default.
@@ -74,3 +78,10 @@ continues retrying. Use `true` only when joining Core is a hard requirement for 
 deployment.
 
 Next: [define process types and understand log capture](./processes-and-logs).
+
+During Spring context destruction, the starter stops normal heartbeats, requests
+cooperative stops, waits within `synapsys.shutdown-timeout`, attempts one final
+heartbeat whose commands are ignored, restores console capture, and releases its
+per-process executors. Shutdown is idempotent and non-throwing. Current `0.2.0`
+starts a final request only if time remains, but does not shorten that request to a
+smaller remaining budget; see [current client differences](/reference/client-lifecycle#current-implementation-differences).

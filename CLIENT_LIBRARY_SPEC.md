@@ -4,10 +4,12 @@ The contract every official Synapsys client library implements, whatever the
 language or framework.
 
 This document is **internal**. It lives outside `content/`, so it is not published
-to the docs site. It exists so that the Go, Node, Python and future libraries
-behave like the same product rather than four independent interpretations of it.
+to the docs site. It exists so that the Node, Spring Boot, Python, Go, .NET, and
+future libraries behave like the same product rather than independent
+interpretations of it.
 
-**Status:** v1, derived from `synapsys-spring-boot-starter` 0.1.0.
+**Status:** v1, reconciled against all five current client implementations on
+2026-08-30; originally derived from `synapsys-spring-boot-starter` 0.1.0.
 
 ## What this covers, and what it does not
 
@@ -847,13 +849,13 @@ rejected the whole heartbeat for — dropping every process command on that beat
 that the client requeued at the front and retried forever, leaving the worker deaf to
 start and stop. Fixed on the starter's `main` by skipping a line whose trimmed
 message is empty, using Go's definition of whitespace rather than Java's narrower
-one; it ships in 0.1.2, which is not yet on Central. Core was hardened in the same
-change: `toSyncServiceRequest` now skips an unreadable log entry and keeps the rest
-of the batch, mirroring what it has always done for `processes`, so no client can
-wedge itself this way again — which is what actually closes the gap for workers
+one; the fix is included in the published 0.2.0 release. Core was hardened in the
+same change: `toSyncServiceRequest` now skips an unreadable log entry and keeps the
+rest of the batch, mirroring what it has always done for `processes`, so no client
+can wedge itself this way again — which is what actually closes the gap for workers
 already running an older starter. `openapi.yaml` documents the new skip semantics.
 
-Open, found while aligning the Node, Python and Spring libraries with this document:
+Open, found while aligning the current libraries with this document:
 
 - **The Go SDK accepts an empty 2xx heartbeat body as success.** `transport.heartbeat`
   decodes only a non-empty body, so a 200 with no body yields an empty
@@ -863,12 +865,10 @@ Open, found while aligning the Node, Python and Spring libraries with this docum
   other libraries to copy it. Malformed (as opposed to empty) JSON is already handled
   correctly there.
 
-- **`ProcessInfoDTO` in the Spring starter is shared between request and response**, so
-  the worker used to echo its own `desiredState` and `desiredToken` back to Core on
-  every beat. Harmless — Core ignores unknown request fields — but it is not what
-  `HeartbeatProcess` in `openapi.yaml` describes. Both fields are now omitted from the
-  request. Splitting the DTO in two would express the asymmetry better than the
-  `NON_NULL` annotations that currently carry it.
+Closed in Spring Boot 0.2.0: `ProcessInfoDTO` is shared between request and response,
+but `desiredState` and `desiredToken` are now omitted from requests through `NON_NULL`
+serialization. Splitting the DTO would express the asymmetry more directly, but the
+wire representation now matches `HeartbeatProcess` in `openapi.yaml`.
 
 Open, found while writing the Node SDK:
 
@@ -881,8 +881,26 @@ Open, found while writing the Node SDK:
   it is also a 19-digit int64 that no IEEE-754 double can represent, which cost the
   Node SDK a silent log-loss bug before release. Clients can and now do handle it,
   but a smaller monotonic counter, or a string id, would remove the trap for every
-  future library. Worth considering before a third client is written.
+  future library.
 
 - **Workers flap after a single missed beat.** `toNeuronDTO` marks a worker inactive
   after one heartbeat interval, which disables the Start/Stop buttons in the
   console. A 2.5–3x grace multiplier was proposed and deferred.
+
+Open, confirmed while documenting the 0.2.0 cross-language lifecycle:
+
+- **Python's final heartbeat is not bounded to the remaining shutdown budget.**
+  `Synapsys.stop()` checks that time remains, then calls `HeartbeatLoop.final_tick()`;
+  the transport still uses the full `request-timeout`. It must use
+  `min(remaining budget, request-timeout)` to satisfy §4.5's hard bound.
+
+- **Spring's final heartbeat has the same remaining-budget gap.**
+  `ProcessHeartbeatManager.shutdown()` skips the final beat after the deadline, but
+  once started, `Client` retains the full configured request timeout. A per-call
+  deadline capped to the remaining shutdown budget is required.
+
+- **The .NET packages are implemented but not yet on NuGet.org.** Both package IDs
+  return 404 as of 2026-08-30. The source and real NuGet-consumer example use
+  `0.1.0-alpha.1`, but no install command may be presented as available until the
+  account, package ownership/prefix, and trusted-publishing policy are configured
+  and the first release succeeds.

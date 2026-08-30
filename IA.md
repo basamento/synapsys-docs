@@ -24,10 +24,15 @@ to a worker. Command tokens make retries idempotent.
 | Core | `ghcr.io/jmarzoli/synapsys-core` | Container serving the operator console and HTTP API on port 8080 |
 | Spring Boot starter | Maven Central: `org.basamento.synapsys:synapsys-spring-boot-starter` | Java 17+, Spring Boot 3.x, automatic discovery and lifecycle |
 | Node.js SDK | npm: `@synapsys-io/sdk` | Node.js 16+, CommonJS and ESM, zero runtime dependencies |
+| Python SDK | PyPI: `basamento-synapsys`; import `basamento_synapsys` | Python 3.9+, sync and async function registration |
+| Go SDK | Go module: `github.com/basamento/synapsys-go-sdk` | Go 1.22+, explicit declarations and context cancellation |
+| .NET SDK | NuGet IDs `Basamento.Synapsys` and `Basamento.Synapsys.Extensions.Hosting` | .NET 8+, implemented but not yet published; core and Generic Host packages |
 | Raw API | `POST /api/v1/workers/heartbeat` | HTTP/JSON integration for any runtime |
 
-Published versions verified on 2026-08-29: Spring Boot `0.1.0`, Node.js `0.1.1`.
-Source repositories can be ahead of these releases; published docs must not be.
+Registry status verified on 2026-08-30: Spring Boot `0.2.0`, Node.js `0.2.0`,
+Python `0.2.0`, and Go `v0.1.0` are public. Both .NET IDs return no package from
+NuGet.org; intended version `0.1.0-alpha.1` must be labelled unavailable. Source
+repositories can be ahead of releases; install snippets must not be.
 
 ## Security facts consumers need
 
@@ -63,6 +68,9 @@ Source repositories can be ahead of these releases; published docs must not be.
 | Core manual | `/manuals/core` | Installation, authentication, configuration, console, and logs |
 | Spring Boot manual | `/manuals/spring-boot` | Install, migrate existing work, configure environments, and define processes |
 | Node.js manual | `/manuals/nodejs` | Install, migrate existing work, configure environments, and define processes |
+| Python manual | `/manuals/python` | Install, register sync/async functions, configure lifecycle, and test business logic |
+| Go manual | `/manuals/go` | Install, register explicit declarations, configure context shutdown, and use scoped logs |
+| .NET manual | `/manuals/dotnet` | Distinguish core/hosting packages, direct delegates, DI scopes, logging, and publication status |
 | Raw API manual | `/manuals/raw-api` | Implement the heartbeat contract without an official library |
 | Reference | `/reference` | Stable HTTP, state, and terminology reference |
 
@@ -106,8 +114,9 @@ caption treatment.
 - Show environment variables through placeholders such as `${SYNAPSYS_CORE_TOKEN}`;
   never publish real credentials, private hosts, internal deployment paths, or
   implementation-only architecture.
-- Do not document unreleased source as available. Planned integrations do not get
-  empty pages or navigation entries.
+- Do not document unreleased source as available. A complete implemented integration
+  may have a manual before publication only when every install command and status
+  table states that it is unavailable; planned integrations do not get empty pages.
 - Every library manual must show the code before and after adoption, installation,
   environment setup, process types, shutdown, failure behaviour, and log capture.
 - Raw API examples must include the bearer header and complete fields required for

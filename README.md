@@ -30,6 +30,9 @@ content/
     core/        /manuals/core
     spring-boot/ /manuals/spring-boot
     nodejs/      /manuals/nodejs
+    python/      /manuals/python
+    go/          /manuals/go
+    dotnet/      /manuals/dotnet
     raw-api/     /manuals/raw-api
   reference/     /reference
 blog/                         — releases and design notes
@@ -46,7 +49,9 @@ unversioned today — the system is v1 until the first public release — but th
 instances exist separately from day one so that turning versioning on never has
 to move a URL.
 
-Only shipped integrations have manuals: Spring Boot, Node.js, and the Raw API.
+Manuals cover Spring Boot, Node.js, Python, Go, .NET, and the Raw API. A manual can
+document an implemented but not-yet-published package only when its availability is
+prominent; the .NET manual follows that rule.
 
 ## Before you edit
 

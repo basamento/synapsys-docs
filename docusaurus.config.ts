@@ -9,8 +9,9 @@ import { themes as prismThemes } from 'prism-react-renderer';
  * release); the instances exist separately from day one so that turning
  * versioning on later never has to move a URL.
  *
- * Only shipped connection methods receive manuals. IA.md records the public
- * product map and the versioning boundaries.
+ * Complete connection methods receive manuals. An implemented but unpublished
+ * package must state that status prominently. IA.md records the product map and
+ * versioning boundaries.
  */
 
 const GITHUB_ORG = 'JMarzoli';
@@ -58,7 +59,7 @@ const config: Config = {
     [
       'classic',
       {
-        // Instance 1 of 6 — the default. Concepts and Get started.
+        // Default instance. Concepts and Get started.
         docs: {
           id: 'concepts',
           path: 'content/concepts',
@@ -138,6 +139,39 @@ const config: Config = {
     [
       '@docusaurus/plugin-content-docs',
       {
+        id: 'python',
+        path: 'content/manuals/python',
+        routeBasePath: 'manuals/python',
+        sidebarPath: './sidebars/python.ts',
+        editUrl: `https://github.com/${GITHUB_ORG}/synapsys-docs/tree/main/`,
+        showLastUpdateTime: true,
+      },
+    ],
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'go',
+        path: 'content/manuals/go',
+        routeBasePath: 'manuals/go',
+        sidebarPath: './sidebars/go.ts',
+        editUrl: `https://github.com/${GITHUB_ORG}/synapsys-docs/tree/main/`,
+        showLastUpdateTime: true,
+      },
+    ],
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'dotnet',
+        path: 'content/manuals/dotnet',
+        routeBasePath: 'manuals/dotnet',
+        sidebarPath: './sidebars/dotnet.ts',
+        editUrl: `https://github.com/${GITHUB_ORG}/synapsys-docs/tree/main/`,
+        showLastUpdateTime: true,
+      },
+    ],
+    [
+      '@docusaurus/plugin-content-docs',
+      {
         id: 'raw-api',
         path: 'content/manuals/raw-api',
         routeBasePath: 'manuals/raw-api',
@@ -186,6 +220,9 @@ const config: Config = {
             { to: '/manuals/core/install', label: 'Core' },
             { to: '/manuals/spring-boot/install', label: 'Spring Boot' },
             { to: '/manuals/nodejs/install', label: 'Node.js' },
+            { to: '/manuals/python/install', label: 'Python' },
+            { to: '/manuals/go/install', label: 'Go' },
+            { to: '/manuals/dotnet/install', label: '.NET' },
             { to: '/manuals/raw-api/overview', label: 'Raw API' },
           ],
         },
@@ -221,6 +258,9 @@ const config: Config = {
           items: [
             { label: 'Spring Boot', to: '/manuals/spring-boot/install' },
             { label: 'Node.js', to: '/manuals/nodejs/install' },
+            { label: 'Python', to: '/manuals/python/install' },
+            { label: 'Go', to: '/manuals/go/install' },
+            { label: '.NET', to: '/manuals/dotnet/install' },
             { label: 'Raw API', to: '/manuals/raw-api/overview' },
           ],
         },
@@ -230,6 +270,9 @@ const config: Config = {
             { label: 'Core', href: `https://github.com/${GITHUB_ORG}/synapsys-core` },
             { label: 'Spring Boot starter', href: `https://github.com/${SDK_GITHUB_ORG}/synapsys-spring-boot-starter` },
             { label: 'Node.js SDK', href: `https://github.com/${SDK_GITHUB_ORG}/synapsys-node-sdk` },
+            { label: 'Python SDK', href: `https://github.com/${SDK_GITHUB_ORG}/synapsys-python-sdk` },
+            { label: 'Go SDK', href: `https://github.com/${SDK_GITHUB_ORG}/synapsys-go-sdk` },
+            { label: '.NET SDK', href: `https://github.com/${SDK_GITHUB_ORG}/synapsys-dotnet-sdk` },
             { label: 'Blog', to: '/blog' },
           ],
         },
@@ -241,7 +284,7 @@ const config: Config = {
       // Code blocks are dark in both themes (design system, tokens.css).
       theme: prismThemes.palenight,
       darkTheme: prismThemes.palenight,
-      additionalLanguages: ['java', 'bash', 'json', 'yaml', 'javascript', 'typescript', 'properties'],
+      additionalLanguages: ['java', 'bash', 'json', 'yaml', 'javascript', 'typescript', 'properties', 'python', 'go', 'csharp'],
     },
 
     docs: {

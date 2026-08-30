@@ -1,13 +1,14 @@
 ---
 title: Connect your first worker
-description: Add the Spring Boot starter or Node.js SDK, set two connection values, and appear in Core.
+description: Choose an official client, set two connection values, and appear in Core.
 ---
 
 # Connect your first worker
 
 A worker needs a stable name, the Core URL, and a worker token. Choose the library
-that matches your application; both use the same environment variable names for
-the connection.
+that matches your application. Spring Boot, Node.js, Python, and Go are published;
+the .NET packages are implemented but awaiting their first NuGet.org release. See
+the [verified compatibility and availability table](/reference/client-libraries).
 
 ## Spring Boot
 
@@ -17,7 +18,7 @@ Add the Maven Central dependency:
 <dependency>
   <groupId>org.basamento.synapsys</groupId>
   <artifactId>synapsys-spring-boot-starter</artifactId>
-  <version>0.1.0</version>
+  <version>0.2.0</version>
 </dependency>
 ```
 
@@ -40,7 +41,7 @@ The starter begins heartbeating automatically when the application starts.
 Install the public npm package:
 
 ```bash
-npm install @synapsys-io/sdk@0.1.1
+npm install @synapsys-io/sdk@0.2.0
 ```
 
 Register and start the worker in your entry point:
@@ -54,6 +55,13 @@ synapsys.start();
 
 `coreUrl` and `coreToken` are read from the environment. ESM users can import the
 same API with `import { Synapsys } from '@synapsys-io/sdk'`.
+
+## Python, Go, and .NET
+
+- [Python manual](/manuals/python/install) — `basamento-synapsys==0.2.0`.
+- [Go manual](/manuals/go/install) — `github.com/basamento/synapsys-go-sdk@v0.1.0`.
+- [.NET manual](/manuals/dotnet/install) — two `net8.0` packages; installation is
+  unavailable until the first NuGet.org release.
 
 ## Set the environment
 

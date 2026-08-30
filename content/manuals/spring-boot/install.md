@@ -20,14 +20,14 @@ Maven needs no additional repository:
 <dependency>
   <groupId>org.basamento.synapsys</groupId>
   <artifactId>synapsys-spring-boot-starter</artifactId>
-  <version>0.1.0</version>
+  <version>0.2.0</version>
 </dependency>
 ```
 
 Gradle:
 
 ```groovy title="build.gradle"
-implementation 'org.basamento.synapsys:synapsys-spring-boot-starter:0.1.0'
+implementation 'org.basamento.synapsys:synapsys-spring-boot-starter:0.2.0'
 ```
 
 ## Before and after
@@ -91,3 +91,9 @@ The starter auto-configures itself and starts with the application. The worker
 should appear in Core within five seconds.
 
 Next: [configure environments and failure behaviour](./configuration).
+
+Version `0.2.0` is available from Maven Central. See the
+[starter source](https://github.com/basamento/synapsys-spring-boot-starter), the
+[Maven example](https://github.com/JMarzoli/synapsys-spring-boot-starter-maven-example),
+the [Gradle example](https://github.com/JMarzoli/synapsys-spring-boot-starter-gradle-example),
+and the [publication matrix](/reference/client-libraries).

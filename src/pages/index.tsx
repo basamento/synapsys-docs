@@ -26,8 +26,8 @@ type WorkerRow = {
 const WORKERS: WorkerRow[] = [
   { name: 'billing-jobs', runtime: 'spring boot · 3 processes', state: 'running' },
   { name: 'etl-runner', runtime: 'node.js · 1 process', state: 'stopping' },
-  { name: 'report-worker', runtime: 'node.js · 2 processes', state: 'idle' },
-  { name: 'report-gen', runtime: 'raw api · 2 processes', state: 'failed' },
+  { name: 'report-worker', runtime: 'python · 2 processes', state: 'idle' },
+  { name: 'inventory-sync', runtime: 'go · 2 processes', state: 'failed' },
 ];
 
 const PILL: Record<WorkerRow['state'], string> = {
@@ -56,7 +56,7 @@ function Hero() {
         <div className={styles.heroCopy}>
           <span className={styles.badge}>
             <span className={styles.dot} />
-            Spring Boot and Node.js integrations are live
+            Five official language integrations
           </span>
           <h1 className={styles.heroTitle}>Bring every scattered script under one roof.</h1>
           <p className={styles.heroLead}>
@@ -106,6 +106,18 @@ function Starters() {
           <Link className={styles.chip} to="/manuals/nodejs/install">
             <span className={styles.chipDot} />
             Node.js
+          </Link>
+          <Link className={styles.chip} to="/manuals/python/install">
+            <span className={styles.chipDot} />
+            Python
+          </Link>
+          <Link className={styles.chip} to="/manuals/go/install">
+            <span className={styles.chipDot} />
+            Go
+          </Link>
+          <Link className={styles.chip} to="/manuals/dotnet/install">
+            <span className={styles.chipDot} />
+            .NET
           </Link>
           <Link className={styles.chip} to="/manuals/raw-api/overview">
             <span className={styles.chipDot} />
@@ -201,7 +213,8 @@ function Cta() {
           <h2 className={styles.ctaTitle}>Point your first worker at a Core in five minutes.</h2>
           <p className={styles.ctaLead}>
             Run the Core container, create a worker token, and add one published dependency.
-            Spring Boot, Node.js, and direct HTTP integrations are supported today.
+            Spring Boot, Node.js, Python, Go, .NET, and direct HTTP integrations share
+            one lifecycle contract. Check each manual for current package availability.
           </p>
         </div>
         <div className={styles.ctaButtons}>

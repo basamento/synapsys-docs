@@ -50,6 +50,9 @@ application but needs a consistent operational surface.
 | --- | --- |
 | Spring Boot 3.x on Java 17+ | [Spring Boot starter](/manuals/spring-boot/install) |
 | Node.js 16+, CommonJS or ESM | [Node.js SDK](/manuals/nodejs/install) |
+| Python 3.9+ | [Python SDK](/manuals/python/install) |
+| Go 1.22+ | [Go SDK](/manuals/go/install) |
+| .NET 8+ | [.NET SDK](/manuals/dotnet/install) — packages await first NuGet release |
 | Another runtime | [Raw HTTP API](/manuals/raw-api/overview) |
 
 Ready to try it? [Run Core](/docs/start/run-the-core), then connect your first

@@ -72,6 +72,8 @@ Use this list before calling a custom heartbeat client production-ready.
 - [ ] During shutdown, stop the normal loop, request cooperative stops, wait a
       bounded time, and send one best-effort final snapshot without applying its
       response commands.
+- [ ] Bound the final request by the lesser of the remaining shutdown budget and
+      request timeout; skip it if the common deadline is already exhausted.
 - [ ] Stop a process whose body ignores cancellation, and confirm it is reported
       rather than killed, and that no replacement run starts over the top of it.
 - [ ] Stop a process and immediately start it again; confirm the start is deferred,
