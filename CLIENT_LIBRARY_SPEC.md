@@ -86,15 +86,15 @@ Every heartbeat carries a `framework` string telling Core which client is
 speaking. Lowercase, no spaces, no version:
 
 ```
-springboot   nodejs   python
+springboot   nodejs   python   go
 ```
 
 **Core validates this field against a fixed set.** `WorkerFramework.Valid()` accepts
-`springboot`, `nodejs`, `python` and `unknown`, and coerces anything else to
+`springboot`, `nodejs`, `python`, `go` and `unknown`, and coerces anything else to
 `unknown` — the exact failure this rule exists to prevent. A new library must have
 its identifier added to Core's enum, to the filter list in `collection.go`, and to
-the frontend card types, **before** the library ships. Until that is done, `go`,
-`dotnet` and `quarkus` are not usable values.
+the frontend card types, **before** the library ships. Until that is done, `dotnet`
+and `quarkus` are not usable values.
 
 Pick it once per library and never change it — Core stores it and operators
 filter on it. Never send `unknown`; that is Core's fallback for clients that omit
@@ -151,7 +151,8 @@ Every library implements this set. Names are canonical; defaults are normative.
 | `synapsys.fail-fast` | `false` | no | Fail application startup when Core is unreachable. |
 | `synapsys.connect-timeout` | `2s` | no | TCP connect timeout. |
 | `synapsys.request-timeout` | `5s` | no | Whole-request timeout. |
-| `synapsys.capture-console` | `true` | no | Stream process console output to Core. `false` leaves the streams untouched — see §5 and §8. |
+| `synapsys.shutdown-timeout` | `10s` | no | How long shutdown waits for running processes to become terminal. Languages with a caller-supplied deadline — Go's `ctx` — use that instead of a setting. |
+| `synapsys.capture-console` | `true` | no | Stream process-scoped output to Core. Global stream replacement is not safe in every ecosystem; see §5 and §8. |
 
 \* Not required by the library, but Core rejects heartbeats without it. Warn
 loudly at startup rather than failing.
@@ -290,12 +291,21 @@ case, not an error.
 ### 4.2 The heartbeat loop
 
 ```
-every heartbeat-interval:
+schedule the next beat one heartbeat-interval AFTER the previous one settles:
     try:                                        # nothing escapes this block
         tick()
     catch anything:
         log ERROR "Unexpected heartbeat failure | heartbeat retries will continue"
 ```
+
+> **Fixed delay, never fixed rate.** A fixed-rate scheduler tries to catch up: a Core
+> that answers slower than one interval leaves a backlog that fires back to back the
+> moment it recovers, which is a burst aimed at a service that has only just come
+> back. Re-arm the timer after each tick settles instead. This also makes overlap
+> impossible; where a scheduler can still overlap — `setInterval` on Node — an
+> explicit in-flight guard skips the beat rather than stacking it. Timing uses the
+> platform's monotonic clock wherever one is available, so a wall-clock adjustment
+> cannot produce a burst either.
 
 > **The loop must be unkillable.** On many runtimes a scheduled task that throws
 > is cancelled permanently, and the worker then goes silent with no further
@@ -331,9 +341,23 @@ tick():
         markCoreUnavailable("Heartbeat rejected by Core with status {status}")
         return
 
+    if response.body is not a readable HeartbeatResponse:
+        logQueue.requeueFront(logs)
+        markCoreUnavailable("Core returned a malformed heartbeat response")
+        return
+
     markCoreAvailable()
     applyCommands(response)
 ```
+
+> **A 2xx that is not a readable response is a failure, not a quiet success.**
+> `processes` is required by `HeartbeatResponse`, so an empty body, an unparseable
+> one, or one with no `processes` array all mean the same thing: this beat delivered
+> no commands. Treating it as success acknowledges nothing while silently discarding
+> the drained log lines, and hides a broken proxy or a half-written response behind a
+> worker that looks healthy. Requeue and mark Core unavailable, exactly as for a
+> transport failure. This is about the response's *shape*: unknown **fields**, and
+> desired states this client version has never heard of, are still ignored — see §7.2.
 
 Not optional:
 
@@ -384,7 +408,6 @@ apply(process, update):
     token = update.desiredToken
     if token is absent: return                  # nothing to do
 
-    process.runId = update.runId                # track even for known tokens
     if token <= process.ackToken: return        # duplicate or stale
 
     process.desiredState = update.desiredState
@@ -396,12 +419,13 @@ apply(process, update):
 
     if command == start:
         log INFO "Starting process '{name}' (type={type}, token={token}, runId={runId})"
-        process.handleStart(update.runId)
+        outcome = process.handleStart(update.runId)
     if command == stop:
         log INFO "Stopping process '{name}' (type={type}, token={token})"
-        process.handleStop()
+        outcome = process.handleStop()
 
-    process.ackToken = token                    # only after the handler returned
+    if outcome != deferred:
+        process.ackToken = token                # only after the handler returned
 ```
 
 > **`idle` is not a stop.** Core resets `desiredState` to `idle` to mean "no
@@ -412,6 +436,11 @@ apply(process, update):
 > unacknowledged and Core redelivers. A client that acknowledges first and then
 > crashes has silently lost the command.
 
+> **A start received while the previous run is `stopping` is deferred.** Do not
+> acknowledge it and do not replace the old run's `runId`. Core redelivers the
+> same token; as soon as the old goroutine/task is terminal, start the new run and
+> acknowledge it. Acknowledging the start as a no-op loses the new run forever.
+
 **One failing process must never affect another.** Isolation is per-process,
 inside the loop, as above.
 
@@ -419,7 +448,9 @@ inside the loop, as above.
 
 ```
 endless.handleStart(runId):
-    if state in (running, stopping): return
+    if state == stopping: return deferred
+    if state == running: return handled
+    process.runId = runId
     state = running                             # BEFORE the thread starts
     spawn thread:
         with logCaptureScope(name, runId):
@@ -433,6 +464,7 @@ endless.handleStart(runId):
                 log ERROR "Endless process '{name}' failed"
                 # never rethrow: it would surface raw on the host's console
         if state != failed: state = idle
+    return handled
 ```
 
 > **Set `running` synchronously, before the worker thread starts.** Setting it
@@ -451,8 +483,9 @@ endless.handleStop():
 
 ```
 progressive.handleStart(runId):
-    if state not in (idle, failed): return
-    if a run is still in flight: return
+    if state == stopping or a run is still in flight: return deferred
+    if state == running: return handled
+    process.runId = runId
     state = running                             # BEFORE submitting
     submit to this process's own executor:
         with logCaptureScope(name, runId):
@@ -469,6 +502,7 @@ progressive.handleStart(runId):
             try: onStop()
             catch error: log ERROR
         if state != failed: state = idle
+    return handled
 ```
 
 ```
@@ -487,14 +521,53 @@ one slow process block another's start command.
 
 ```
 on application stop:
-    uninstall console capture              # restore the original streams
-    stop the heartbeat loop
-    cancel process executors
+    deadline = now + shutdown budget            # synapsys.shutdown-timeout, or ctx
+    stop the normal heartbeat loop and prevent another beat from starting
+    request cooperative stop for every running process
+    wait until deadline for processes to become terminal
+        for each still in flight at the deadline:
+            log WARN "Process '{name}' did not stop before the shutdown timeout"
+    if now < deadline:
+        send one best-effort final heartbeat with final states and queued logs
+            bounded by min(deadline - now, request-timeout)
+            ignore commands in its response
+            log transport failure locally; never fail or extend shutdown for it
+    else:
+        log DEBUG "Shutdown budget exhausted | skipping the final heartbeat"
+    uninstall console capture / close transport resources
     log INFO "Worker stopped"
 ```
 
+**The deadline is a hard bound on the whole sequence.** If it is already exhausted
+when the processes have been waited for — or was zero on entry — the final heartbeat
+is **skipped**, not attempted with a fresh timeout. A library that sends it anyway
+runs past the deadline its caller set, which is the one thing a shutdown bound exists
+to prevent. Losing one snapshot is cheaper than blocking a container's termination
+grace period, and Core marks the worker inactive on its own soon after.
+
+**Order matters at the end.** Console capture is uninstalled *after* the final
+heartbeat, so that everything the stop sequence printed — cleanup hooks included —
+gets one chance to reach Core.
+
+**Shutdown is idempotent, non-throwing, and safe to call concurrently.** A second
+call while the first is still running joins it or returns; it never starts a second
+teardown, and exactly one final heartbeat is sent however many times it is called.
+
+**A process that outlasts the budget is reported, not killed.** No language here can
+safely stop a thread, goroutine or task it does not own. Such a process is named in a
+WARN, kept observed, and — this is the part that matters — still counts as in flight,
+so a later start command is deferred rather than overlapping it (§4.4).
+
 Shutdown must be **idempotent and non-throwing**. It runs during teardown, where
-an exception is at best noise and at worst masks the real cause.
+an exception is at best noise and at worst masks the real cause. Business logic
+that ignores cancellation may remain alive after the bound: the library cannot
+safely kill a thread or goroutine. The application owns the final decision to
+keep waiting or exit.
+
+In Go, returning `ctx.Err()` from `Worker.Stop(ctx)` when business goroutines miss
+the caller's deadline is the idiomatic non-panicking form of that last decision.
+Transport or final-heartbeat failures are logged but never included in the return
+value.
 
 ---
 
@@ -555,6 +628,29 @@ Rules:
 Where a language makes global stream replacement genuinely unsafe, capture at the
 logging-framework level instead and **say so in that library's README**. Do not
 silently ship without the feature.
+
+**Where global replacement is used, its limits are documented, not glossed over.**
+Java (`System.setOut`), Node (`process.stdout.write`) and Python (`sys.stdout`) all
+replace a process-wide stream, and each library's README states plainly: only one
+capture is installed per process; only output that actually travels through the
+replaced entry point is captured, so a logger holding the original stream or writing
+to a file descriptor bypasses it; the originals are restored on shutdown only if they
+are still the ones the library installed, so a wrapper installed on top is never
+clobbered; the library's own log lines bypass the capture entirely, through handles
+taken before installation, so it can neither recurse nor ship its own diagnostics to
+Core as user output; and the queue, line length and per-beat batch are all bounded,
+dropping oldest.
+
+**Go exception.** Go's stdout and stderr are process-global, while goroutines have
+no goroutine-local storage. Replacing `os.Stdout`/`os.Stderr` cannot reliably tell
+which concurrent process produced a line and can interfere with the host
+application. The Go SDK therefore captures only explicit process-scoped sinks: a
+`*slog.Logger` and/or `io.Writer` supplied by the worker. They tee to the
+application's destination while queueing the same lines for Core. The sinks work
+with the standard `log` package (`log.New(writer, ...)`), `slog`, and third-party
+loggers that accept an `io.Writer` or `slog.Handler`. Plain `fmt.Print` and writes
+directly to `os.Stdout`/`os.Stderr` are not captured. `synapsys.capture-console`
+enables or disables these sinks; it never swaps global streams in Go.
 
 ---
 
@@ -632,6 +728,10 @@ has cost real debugging time somewhere.
 
 - Send the token as `Authorization: Bearer {token}`. Never in a query string,
   never in a URL, never logged.
+- **The startup health probe is unauthenticated.** Core serves `GET /api/health`
+  without a security scheme, and a credential is not sent to an endpoint that does not
+  ask for one: every place a token travels is a place it can leak. Bearer
+  authentication applies to `POST /api/v1/workers/heartbeat` and nothing else.
 - **Warn when the Core URL is not HTTPS and a token is set**, unless the host is
   loopback. A bearer token over plaintext HTTP is a credential leak, and the user
   usually has not noticed.
@@ -660,6 +760,21 @@ Beyond the protocol tests in `raw-api/checklist.md`, every library proves:
 - [ ] Drained logs are not lost when the heartbeat fails.
 - [ ] `enabled: false` produces zero network calls and unmodified streams.
 - [ ] Startup with Core down succeeds; with `fail-fast` it fails.
+- [ ] A start received while the previous run is `stopping` is **not** acknowledged,
+      does not replace the active `runId`, does not start a second execution, and is
+      applied when Core redelivers it after that run becomes terminal.
+- [ ] A duplicate start for the running execution is a handled no-op that does not
+      reassign the active `runId`; a stop for an inactive process is a handled no-op.
+- [ ] A body that ignores cancellation outlasts the shutdown budget, is reported by
+      name, is not killed, and blocks a replacement execution from overlapping it.
+- [ ] Shutdown sends exactly one final heartbeat, ignores its response commands, and
+      survives that heartbeat failing, timing out, or being skipped for an exhausted
+      budget.
+- [ ] Shutdown is idempotent under repeated and concurrent calls.
+- [ ] A 2xx heartbeat response that is empty or unparseable requeues its logs in
+      order and acknowledges nothing.
+- [ ] A slow Core delays the loop instead of producing a catch-up burst, and two
+      heartbeats are never in flight at once.
 
 ---
 
@@ -705,6 +820,18 @@ When a change affects more than one library:
 | 2026-08-28 | §2 notes that libraries may add ecosystem-specific settings; Node adds `logger`, `log-level` | all |
 | 2026-08-28 | §4.2 new rule: **`runId` is an opaque int64** and must round-trip exactly. Found in the Node SDK, where JSON.parse rounded Core's 19-digit nanosecond id and every captured log line was then silently discarded by Core | all, especially JS/TS |
 | 2026-08-28 | Core no longer rejects a heartbeat for one unreadable `logs` entry: it skips the entry and applies the rest, as it already did for `processes`. §5's client rule is unchanged; its rationale is not | all |
+| 2026-08-29 | Core, its framework filter, and the console now recognize the `go` framework identifier | Go, Core |
+| 2026-08-29 | §4 defines start-while-stopping as a deferred, unacknowledged command, preserving the active run id until the old run is terminal | all |
+| 2026-08-29 | §4.5 defines bounded cooperative shutdown followed by one best-effort final heartbeat whose response commands are ignored | all |
+| 2026-08-29 | §5 records Go's process-scoped `slog`/`io.Writer` capture contract and prohibits unsafe global stdout/stderr interception | Go |
+| 2026-08-29 | §4.2 new rule: **heartbeats are scheduled at a fixed delay, never a fixed rate**, and never overlap. A slow Core delays the loop rather than producing a catch-up burst | all |
+| 2026-08-29 | §4.2 new rule: a **2xx heartbeat response that is empty or not a readable `HeartbeatResponse` is a protocol failure** — requeue the drained logs, acknowledge nothing, mark Core unavailable. Unknown *fields* remain ignored | all |
+| 2026-08-29 | §4.5 tightened: the shutdown budget is a **hard bound on the whole sequence**. The final heartbeat is bounded by `min(remaining budget, request-timeout)` and **skipped entirely** when the budget is already exhausted. Capture is uninstalled after it, not before. Shutdown is idempotent under concurrent calls and sends exactly one final beat | all |
+| 2026-08-29 | §2 new setting `synapsys.shutdown-timeout`, default `10s`, for languages with no caller-supplied deadline. Go keeps using `ctx` | Node, Python, Spring |
+| 2026-08-29 | §8 new rule: the **startup health probe is unauthenticated**, matching Core, which serves `/api/health` with no security scheme | all |
+| 2026-08-29 | §5 requires each library that replaces a global stream to document the limits of doing so in its README | Node, Python, Spring |
+| 2026-08-29 | §9 checklist extended with the deferred-start, shutdown, malformed-response and scheduling cases | all |
+| 2026-08-29 | Node, Python and Spring brought in line with §4.3–§4.5: deferred starts, run-id preservation, bounded shutdown with a final heartbeat. Spring gains `capture-console`, which §2 had required and it did not implement — and which `ignoreUnknownFields = false` had been turning into a startup failure | Node, Python, Spring |
 
 ### Known gaps in the surrounding contract
 
@@ -724,13 +851,29 @@ of the batch, mirroring what it has always done for `processes`, so no client ca
 wedge itself this way again — which is what actually closes the gap for workers
 already running an older starter. `openapi.yaml` documents the new skip semantics.
 
+Open, found while aligning the Node, Python and Spring libraries with this document:
+
+- **The Go SDK accepts an empty 2xx heartbeat body as success.** `transport.heartbeat`
+  decodes only a non-empty body, so a 200 with no body yields an empty
+  `heartbeatResponse` and the beat is treated as healthy. Under the §4.2 rule added on
+  2026-08-29 that is a protocol failure. Go is otherwise the reference for every rule
+  in §4; this one case is a divergence to fix in the Go SDK, not a licence for the
+  other libraries to copy it. Malformed (as opposed to empty) JSON is already handled
+  correctly there.
+
+- **`ProcessInfoDTO` in the Spring starter is shared between request and response**, so
+  the worker used to echo its own `desiredState` and `desiredToken` back to Core on
+  every beat. Harmless — Core ignores unknown request fields — but it is not what
+  `HeartbeatProcess` in `openapi.yaml` describes. Both fields are now omitted from the
+  request. Splitting the DTO in two would express the asymmetry better than the
+  `NON_NULL` annotations that currently carry it.
+
 Open, found while writing the Node SDK:
 
-- **Core's `WorkerFramework` enum has no room for the planned libraries.** It
-  accepts only `springboot`, `nodejs`, `python` and `unknown`, so the `go`, `dotnet`
-  and `quarkus` identifiers named in §1.2 would each be recorded as `unknown`. The
-  enum, the filter list in `collection.go`, and the frontend `WorkerCard` /
-  `ProcessCard` types all need the value added before such a library ships.
+- **Core's `WorkerFramework` enum must be extended for each planned library.** Go
+  is now accepted end to end. `dotnet` and `quarkus` would still be recorded as
+  `unknown`; their enum, filter, and frontend values must be added before those
+  libraries ship.
 
 - **Core uses `time.Now().UnixNano()` as the `runId`.** It is unique and cheap, but
   it is also a 19-digit int64 that no IEEE-754 double can represent, which cost the

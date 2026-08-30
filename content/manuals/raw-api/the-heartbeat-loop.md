@@ -8,6 +8,14 @@ description: Send an authenticated process snapshot, receive commands, acknowled
 Send a heartbeat every few seconds with a bounded timeout. Every request is a full
 process snapshot and must carry a worker bearer token.
 
+Schedule the next beat once the previous one has settled, rather than on a fixed
+rate. A Core that answers slower than one interval then delays the loop instead of
+leaving a backlog that fires back to back the moment it recovers. Two heartbeats are
+never in flight at the same time.
+
+The startup health probe, `GET /api/health`, is unauthenticated: it asks for no
+credential, so none is sent.
+
 ## Request
 
 ```bash
@@ -62,6 +70,17 @@ For each returned process:
 5. Advance `ackToken` only after handling succeeds.
 6. Echo the assigned `runId` on later process snapshots and log entries.
 
+If a start is returned while the previous execution is still `stopping`, defer
+it: do not advance `ackToken` and do not replace the old execution's `runId`.
+Core will return the same command again. Apply and acknowledge it after the old
+execution becomes terminal.
+
+A 2xx response whose body is empty, unparseable, or missing `processes` delivered no
+commands. Treat it as a failed beat: requeue the drained log lines at the front of
+the queue, acknowledge nothing, and retry on the next beat. Unknown *fields*, and
+desired states a client has never heard of, are still ignored — that is forward
+compatibility, and it is a different thing from a response the client cannot read.
+
 `runId` is an opaque signed 64-bit value. JavaScript and other runtimes backed by
 IEEE-754 numbers cannot represent every value exactly. Parse and preserve it with a
 64-bit-safe JSON strategy, then send it back as a JSON number without changing its
@@ -91,3 +110,9 @@ heartbeat.
 If the request fails or Core rejects it, put drained log lines back at the front of
 the queue and retry later. A heartbeat failure must never stop a user's running
 process or terminate the loop.
+
+On application shutdown, stop the normal loop, request cooperative stops, and
+wait up to an application-defined bound. Then make one best-effort heartbeat with
+the final states and queued logs. Ignore commands in that response: shutdown must
+not start new work. A failure of this final request is diagnostic only and must
+not block or fail shutdown.

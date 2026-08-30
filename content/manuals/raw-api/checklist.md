@@ -15,15 +15,20 @@ Use this list before calling a custom heartbeat client production-ready.
 - [ ] The token comes from a secret mechanism and never appears in logs or URLs.
 - [ ] The Core URL uses HTTPS outside isolated local development.
 - [ ] Redirects do not forward the bearer token to another host.
+- [ ] The health probe is sent unauthenticated: `/api/health` asks for no credential.
 
 ## Heartbeat
 
 - [ ] Send `POST /api/v1/workers/heartbeat` on a positive whole-second interval.
+- [ ] Schedule the next beat after the previous one settles, so beats never overlap
+      and a slow Core cannot produce a catch-up burst.
 - [ ] Send every process on every beat, including idle processes.
 - [ ] Report `workerName`, `framework`, `heartbeatInterval`, and `processes`.
 - [ ] Apply connection and whole-request timeouts.
 - [ ] Catch every error at the loop boundary so one exception cannot kill it.
 - [ ] Ignore unknown response fields for forward compatibility.
+- [ ] Treat a 2xx whose body is empty or carries no `processes` array as a failure:
+      requeue the drained logs and acknowledge nothing.
 - [ ] Core being unavailable does not stop running user work.
 
 ## Commands and state
@@ -34,6 +39,8 @@ Use this list before calling a custom heartbeat client production-ready.
 - [ ] `failed` is reportable but never accepted as a desired state.
 - [ ] One process failure cannot block another process's command.
 - [ ] Duplicate start commands cannot create duplicate runs.
+- [ ] A start received while the previous run is `stopping` stays unacknowledged
+      and keeps the old `runId` until that run is terminal.
 - [ ] Preserve and echo `runId` exactly as an opaque 64-bit value.
 
 ## Process types
@@ -62,3 +69,12 @@ Use this list before calling a custom heartbeat client production-ready.
 - [ ] Stop a sleeping or in-flight process and confirm it exits cooperatively.
 - [ ] Send concurrent process output and confirm lines remain attached to the right run.
 - [ ] Revoke the token and confirm the next heartbeat receives `401`.
+- [ ] During shutdown, stop the normal loop, request cooperative stops, wait a
+      bounded time, and send one best-effort final snapshot without applying its
+      response commands.
+- [ ] Stop a process whose body ignores cancellation, and confirm it is reported
+      rather than killed, and that no replacement run starts over the top of it.
+- [ ] Stop a process and immediately start it again; confirm the start is deferred,
+      unacknowledged, and applied only once the old run is terminal.
+- [ ] Call shutdown twice, and concurrently, and confirm exactly one final snapshot
+      is sent.

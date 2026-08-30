@@ -43,10 +43,16 @@ Command completion and execution completion are different. A start command is
 complete once accepted, while its execution and `runId` remain active until the
 process finishes or stops.
 
+If a new start arrives while the previous run is still `stopping`, it has not yet
+been accepted. The worker leaves its token unacknowledged and preserves the old
+run id. Core redelivers the command until the old run is terminal; the worker then
+starts the new execution and acknowledges it.
+
 ## Invariants
 
 - `ackToken` never decreases.
 - A command with `desiredToken <= ackToken` is a duplicate and must be ignored.
 - `failed` is never sent as a desired state.
 - `idle` as a desired state means no command; it is never an instruction to stop.
+- A deferred start never advances `ackToken` or replaces the active `runId`.
 - A heartbeat is rejected only when **no** process in it is readable.
