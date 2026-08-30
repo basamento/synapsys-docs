@@ -6,7 +6,7 @@ description: Run Synapsys Core from GitHub Container Registry with persistent st
 # Install Core
 
 The supported Core distribution is the container image
-`ghcr.io/jmarzoli/synapsys-core`. It exposes the console and API on port `8080` and
+`ghcr.io/basamento/synapsys-core`. It exposes the console and API on port `8080` and
 needs a persistent volume plus bootstrap credentials.
 
 ## Docker Compose
@@ -16,7 +16,7 @@ Create a Compose file:
 ```yaml title="compose.yaml"
 services:
   core:
-    image: ghcr.io/jmarzoli/synapsys-core:latest
+    image: ghcr.io/basamento/synapsys-core:latest
     restart: unless-stopped
     ports:
       - "8080:8080"

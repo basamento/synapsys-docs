@@ -42,7 +42,7 @@ is not a scheduler: Core chooses when each registered function is invoked.
 Version `0.2.0` is available on [PyPI](https://pypi.org/project/basamento-synapsys/)
 and is classified Alpha even though its version has no prerelease suffix. See the
 [SDK source](https://github.com/basamento/synapsys-python-sdk), the
-[consumer example](https://github.com/JMarzoli/synapsys-python-sdk-example), and the
+[consumer example](https://github.com/basamento/synapsys-python-sdk-example), and the
 [ecosystem release matrix](/reference/client-libraries).
 
 Next: [configure lifecycle, logging, and shutdown](./configuration).

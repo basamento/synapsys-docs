@@ -32,7 +32,7 @@ Create `compose.yaml`:
 ```yaml
 services:
   core:
-    image: ghcr.io/jmarzoli/synapsys-core:latest
+    image: ghcr.io/basamento/synapsys-core:latest
     restart: unless-stopped
     ports:
       - "127.0.0.1:8080:8080"

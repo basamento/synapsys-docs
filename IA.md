@@ -21,7 +21,7 @@ to a worker. Command tokens make retries idempotent.
 
 | Surface | Distribution | Public contract |
 | --- | --- | --- |
-| Core | `ghcr.io/jmarzoli/synapsys-core` | Container serving the operator console and HTTP API on port 8080 |
+| Core | `ghcr.io/basamento/synapsys-core` | Container serving the operator console and HTTP API on port 8080 |
 | Spring Boot starter | Maven Central: `org.basamento.synapsys:synapsys-spring-boot-starter` | Java 17+, Spring Boot 3.x, automatic discovery and lifecycle |
 | Node.js SDK | npm: `@synapsys-io/sdk` | Node.js 16+, CommonJS and ESM, zero runtime dependencies |
 | Python SDK | PyPI: `basamento-synapsys`; import `basamento_synapsys` | Python 3.9+, sync and async function registration |

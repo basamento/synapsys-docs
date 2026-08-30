@@ -5,7 +5,7 @@ description: Start Synapsys Core from its GitHub Container Registry image with s
 
 # Run the Core
 
-Core is distributed as a container at `ghcr.io/jmarzoli/synapsys-core`. It serves
+Core is distributed as a container at `ghcr.io/basamento/synapsys-core`. It serves
 the web console and API on port `8080`, and stores its state in a persistent volume.
 
 ## 1. Create bootstrap secrets
@@ -28,7 +28,7 @@ produces a suitable random password.
 ## 2. Start the container
 
 ```bash
-docker pull ghcr.io/jmarzoli/synapsys-core:latest
+docker pull ghcr.io/basamento/synapsys-core:latest
 
 docker run -d \
   --name synapsys-core \
@@ -36,7 +36,7 @@ docker run -d \
   --env-file synapsys.env \
   -p 8080:8080 \
   -v synapsys-data:/app/data \
-  ghcr.io/jmarzoli/synapsys-core:latest
+  ghcr.io/basamento/synapsys-core:latest
 ```
 
 Open `http://localhost:8080` and sign in with the operator credentials from the

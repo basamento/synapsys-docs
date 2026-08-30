@@ -14,15 +14,14 @@ import { themes as prismThemes } from 'prism-react-renderer';
  * versioning boundaries.
  */
 
-const GITHUB_ORG = 'JMarzoli';
-const SDK_GITHUB_ORG = 'basamento';
+const GITHUB_ORG = 'basamento';
 
 const config: Config = {
   title: 'Synapsys',
   tagline: 'Bring every scattered script under one roof',
   favicon: 'img/favicon.svg',
 
-  url: 'https://docs.synapsys.jmzworks.it',
+  url: 'https://docs.synapsys.basamento.org',
   baseUrl: '/',
   organizationName: GITHUB_ORG,
   projectName: 'synapsys-docs',
@@ -268,11 +267,11 @@ const config: Config = {
           title: 'Project',
           items: [
             { label: 'Core', href: `https://github.com/${GITHUB_ORG}/synapsys-core` },
-            { label: 'Spring Boot starter', href: `https://github.com/${SDK_GITHUB_ORG}/synapsys-spring-boot-starter` },
-            { label: 'Node.js SDK', href: `https://github.com/${SDK_GITHUB_ORG}/synapsys-node-sdk` },
-            { label: 'Python SDK', href: `https://github.com/${SDK_GITHUB_ORG}/synapsys-python-sdk` },
-            { label: 'Go SDK', href: `https://github.com/${SDK_GITHUB_ORG}/synapsys-go-sdk` },
-            { label: '.NET SDK', href: `https://github.com/${SDK_GITHUB_ORG}/synapsys-dotnet-sdk` },
+            { label: 'Spring Boot starter', href: `https://github.com/${GITHUB_ORG}/synapsys-spring-boot-starter` },
+            { label: 'Node.js SDK', href: `https://github.com/${GITHUB_ORG}/synapsys-node-sdk` },
+            { label: 'Python SDK', href: `https://github.com/${GITHUB_ORG}/synapsys-python-sdk` },
+            { label: 'Go SDK', href: `https://github.com/${GITHUB_ORG}/synapsys-go-sdk` },
+            { label: '.NET SDK', href: `https://github.com/${GITHUB_ORG}/synapsys-dotnet-sdk` },
             { label: 'Blog', to: '/blog' },
           ],
         },

@@ -25,7 +25,7 @@ dotnet add package Basamento.Synapsys.Extensions.Hosting --version 0.1.0-alpha.1
 ```
 
 Do not add a project reference to a checkout as a substitute in production. The
-[.NET example](https://github.com/JMarzoli/synapsys-dotnet-sdk-example) is already a
+[.NET example](https://github.com/basamento/synapsys-dotnet-sdk-example) is already a
 real NuGet consumer: it references `Basamento.Synapsys.Extensions.Hosting` and its
 `NuGet.Config` contains only NuGet.org. It will restore after the first release; it
 does not clone or reference SDK source.

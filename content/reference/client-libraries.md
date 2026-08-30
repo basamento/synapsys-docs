@@ -58,7 +58,7 @@ dotnet add package Basamento.Synapsys --version 0.1.0-alpha.1
 dotnet add package Basamento.Synapsys.Extensions.Hosting --version 0.1.0-alpha.1
 ```
 
-The [.NET example](https://github.com/JMarzoli/synapsys-dotnet-sdk-example) is a real
+The [.NET example](https://github.com/basamento/synapsys-dotnet-sdk-example) is a real
 NuGet consumer: its project has a `PackageReference` and `NuGet.Config` points only
 to NuGet.org. It does not clone or reference the SDK source. Consequently, restore
 is expected to fail until those package IDs are published.
@@ -67,11 +67,11 @@ is expected to fail until those package IDs are published.
 
 | Library | Source | Runnable consumer example |
 | --- | --- | --- |
-| Node.js | [`basamento/synapsys-node-sdk`](https://github.com/basamento/synapsys-node-sdk) | [`JMarzoli/synapsys-node-sdk-example`](https://github.com/JMarzoli/synapsys-node-sdk-example) |
-| Spring Boot | [`basamento/synapsys-spring-boot-starter`](https://github.com/basamento/synapsys-spring-boot-starter) | [Maven](https://github.com/JMarzoli/synapsys-spring-boot-starter-maven-example), [Gradle](https://github.com/JMarzoli/synapsys-spring-boot-starter-gradle-example) |
-| Python | [`basamento/synapsys-python-sdk`](https://github.com/basamento/synapsys-python-sdk) | [`JMarzoli/synapsys-python-sdk-example`](https://github.com/JMarzoli/synapsys-python-sdk-example) |
-| Go | [`basamento/synapsys-go-sdk`](https://github.com/basamento/synapsys-go-sdk) | [`JMarzoli/synapsys-go-sdk-example`](https://github.com/JMarzoli/synapsys-go-sdk-example) |
-| .NET | [`basamento/synapsys-dotnet-sdk`](https://github.com/basamento/synapsys-dotnet-sdk) | [`JMarzoli/synapsys-dotnet-sdk-example`](https://github.com/JMarzoli/synapsys-dotnet-sdk-example) |
+| Node.js | [`basamento/synapsys-node-sdk`](https://github.com/basamento/synapsys-node-sdk) | [`basamento/synapsys-node-sdk-example`](https://github.com/basamento/synapsys-node-sdk-example) |
+| Spring Boot | [`basamento/synapsys-spring-boot-starter`](https://github.com/basamento/synapsys-spring-boot-starter) | [Maven](https://github.com/basamento/synapsys-spring-boot-starter-maven-example), [Gradle](https://github.com/basamento/synapsys-spring-boot-starter-gradle-example) |
+| Python | [`basamento/synapsys-python-sdk`](https://github.com/basamento/synapsys-python-sdk) | [`basamento/synapsys-python-sdk-example`](https://github.com/basamento/synapsys-python-sdk-example) |
+| Go | [`basamento/synapsys-go-sdk`](https://github.com/basamento/synapsys-go-sdk) | [`basamento/synapsys-go-sdk-example`](https://github.com/basamento/synapsys-go-sdk-example) |
+| .NET | [`basamento/synapsys-dotnet-sdk`](https://github.com/basamento/synapsys-dotnet-sdk) | [`basamento/synapsys-dotnet-sdk-example`](https://github.com/basamento/synapsys-dotnet-sdk-example) |
 
 ## Publication matrix
 

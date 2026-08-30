@@ -94,6 +94,6 @@ Next: [configure environments and failure behaviour](./configuration).
 
 Version `0.2.0` is available from Maven Central. See the
 [starter source](https://github.com/basamento/synapsys-spring-boot-starter), the
-[Maven example](https://github.com/JMarzoli/synapsys-spring-boot-starter-maven-example),
-the [Gradle example](https://github.com/JMarzoli/synapsys-spring-boot-starter-gradle-example),
+[Maven example](https://github.com/basamento/synapsys-spring-boot-starter-maven-example),
+the [Gradle example](https://github.com/basamento/synapsys-spring-boot-starter-gradle-example),
 and the [publication matrix](/reference/client-libraries).

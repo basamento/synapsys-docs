@@ -72,5 +72,5 @@ heartbeat. Next: [configure every environment and shutdown path](./configuration
 Version `0.2.0` is available on [npm](https://www.npmjs.com/package/@synapsys-io/sdk).
 The SDK supports Node 16+, CommonJS and ESM, ships TypeScript declarations, and has
 no runtime dependencies. See the [source](https://github.com/basamento/synapsys-node-sdk),
-the [consumer example](https://github.com/JMarzoli/synapsys-node-sdk-example), and
+the [consumer example](https://github.com/basamento/synapsys-node-sdk-example), and
 the [publication matrix](/reference/client-libraries).

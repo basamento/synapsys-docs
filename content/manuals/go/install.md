@@ -36,7 +36,7 @@ Version `v0.1.0` is available through the [Go module
 proxy](https://proxy.golang.org/github.com/basamento/synapsys-go-sdk/@v/list) and
 [pkg.go.dev](https://pkg.go.dev/github.com/basamento/synapsys-go-sdk). See the
 [source](https://github.com/basamento/synapsys-go-sdk), the
-[consumer example](https://github.com/JMarzoli/synapsys-go-sdk-example), and the
+[consumer example](https://github.com/basamento/synapsys-go-sdk-example), and the
 [release matrix](/reference/client-libraries).
 
 Next: [configure startup, logging, and shutdown](./configuration).
