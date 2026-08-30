@@ -55,5 +55,6 @@ application but needs a consistent operational surface.
 | .NET 8+ | [.NET SDK](/manuals/dotnet/install) — packages await first NuGet release |
 | Another runtime | [Raw HTTP API](/manuals/raw-api/overview) |
 
-Ready to try it? [Run Core](/docs/start/run-the-core), then connect your first
+Ready to try it? The fastest look is the [hosted sandbox](/docs/start/sandbox),
+which needs no installation. To run your own, [run Core](/docs/start/run-the-core), then connect your first
 worker.

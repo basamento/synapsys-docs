@@ -9,6 +9,7 @@ const sidebars: SidebarsConfig = {
       collapsible: false,
       link: { type: 'doc', id: 'start/index' },
       items: [
+        'start/sandbox',
         'start/run-the-core',
         'start/first-worker',
         'start/start-and-stop',

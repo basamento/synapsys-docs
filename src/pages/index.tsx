@@ -67,6 +67,9 @@ function Hero() {
             <Link className={styles.btnPrimary} to="/docs/start">
               Start in 5 minutes
             </Link>
+            <Link className={styles.btnSecondary} to="/docs/start/sandbox">
+              Try the live sandbox
+            </Link>
             <Link className={styles.btnSecondary} to="/docs/concepts/heartbeat-protocol">
               Read the protocol
             </Link>

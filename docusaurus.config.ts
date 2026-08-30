@@ -227,6 +227,7 @@ const config: Config = {
         },
         { to: '/reference/glossary', label: 'Reference', position: 'left' },
         { to: '/blog', label: 'Blog', position: 'left' },
+        { to: '/docs/start/sandbox', label: 'Try it', position: 'right' },
         {
           href: `https://github.com/${GITHUB_ORG}/synapsys-core`,
           label: 'GitHub',
