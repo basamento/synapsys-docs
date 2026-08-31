@@ -277,7 +277,7 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `Synapsys — one nervous system for everything your company runs.`,
+      copyright: `Synapsys — one nervous system for everything your company runs.<br />© 2026 Julian Marzoli (Basamento). <a href="/legal">Legal and licensing</a>.`,
     },
 
     prism: {
