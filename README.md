@@ -83,3 +83,11 @@ individual pages.
   is set once, outside any theme block, on purpose.
 - **`.md` files are parsed as MDX.** HTML comments do not work — use
   `{/* truncate */}` in blog posts, not `<!-- truncate -->`.
+
+## Copyright and licence
+
+Copyright 2026 Julian Marzoli (Basamento). All rights reserved.
+
+The original documentation content and website source are proprietary. The
+published documentation may be read and used to work with Synapsys products;
+other use requires permission. See [LICENSE](LICENSE).
