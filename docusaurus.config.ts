@@ -91,6 +91,7 @@ const config: Config = {
   ],
 
   plugins: [
+    require('./scripts/third-party-notices.cjs'),
     [
       '@docusaurus/plugin-content-docs',
       {

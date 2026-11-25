@@ -3,8 +3,6 @@
 The visual system for the Synapsys documentation site. Everything here is
 decided; nothing here is built yet.
 
----
-
 ## What is in here
 
 | Path | What it is |

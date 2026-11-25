@@ -47,5 +47,10 @@
   "engines": {
     "node": ">=20.0"
   },
-  "description": "Documentation website for the Synapsys ecosystem"
+  "description": "Documentation website for the Synapsys ecosystem",
+  "overrides": {
+    "tinypool": "^2.2.0",
+    "serialize-javascript": "^7.1.4",
+    "uuid": "^11.1.1"
+  }
 }

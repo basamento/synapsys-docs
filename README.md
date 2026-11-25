@@ -20,6 +20,15 @@ npm run typecheck  # tsc, no emit
 
 Requires Node 20 or later.
 
+## Publishing the site
+
+Run `npm run build` to generate a static site in `build/`. The generated files
+can be served by a static web server. The build also generates
+`build/third-party-notices.txt` from the client compilation. If a dependency
+does not include a license file, the build fails until its license text and
+provenance have been checked and the collector updated. The Infima fallback
+uses the license in its upstream release tag.
+
 ## Layout
 
 ```
@@ -83,11 +92,15 @@ individual pages.
   is set once, outside any theme block, on purpose.
 - **`.md` files are parsed as MDX.** HTML comments do not work — use
   `{/* truncate */}` in blog posts, not `<!-- truncate -->`.
+- **Security overrides:** `package.json` selects newer versions of `tinypool`,
+  `serialize-javascript`, and `uuid` than some build dependencies request.
+  Reassess the overrides when upgrading Docusaurus, and run the production build
+  and development server before changing them.
 
 ## Copyright and licence
 
-Copyright 2026 Julian Marzoli (Basamento). All rights reserved.
+Copyright 2026 Julian Marzoli (Basamento).
 
-The original documentation content and website source are proprietary. The
-published documentation may be read and used to work with Synapsys products;
-other use requires permission. See [LICENSE](LICENSE).
+The original documentation content and website source are licensed under the
+Apache License 2.0. See [LICENSE](LICENSE). Third-party components retain their
+own licenses. Synapsys Core is licensed separately.
