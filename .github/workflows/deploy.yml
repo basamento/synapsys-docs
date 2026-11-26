@@ -37,3 +37,35 @@ jobs:
 
       - name: Build documentation
         run: npm run build
+
+      - name: Package built documentation
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        run: tar -czf documentation.tar.gz -C build .
+
+      - name: Upload deployment artifact
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentation-${{ github.run_id }}-${{ github.run_attempt }}
+          path: documentation.tar.gz
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Notify deployment service
+        if: >-
+          vars.DOCS_DISPATCH_ENABLED == 'true' &&
+          github.ref == 'refs/heads/main' &&
+          github.event_name != 'pull_request'
+        env:
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_DISPATCH_TOKEN }}
+          DEPLOY_TARGET: ${{ secrets.DEPLOY_TARGET_REPOSITORY }}
+        run: |
+          set -euo pipefail
+          [[ "$DEPLOY_TARGET" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]] || { echo 'Invalid deployment target' >&2; exit 1; }
+          test -n "$DEPLOY_TOKEN" || { echo 'Missing deployment token' >&2; exit 1; }
+          payload=$(jq -n --arg run "$GITHUB_RUN_ID" --arg attempt "$GITHUB_RUN_ATTEMPT" --arg sha "$GITHUB_SHA" \
+            '{event_type:"docs-built",client_payload:{run_id:$run,attempt:$attempt,sha:$sha}}')
+          curl --fail-with-body --silent --show-error --max-time 20 -X POST \
+            -H "Authorization: Bearer $DEPLOY_TOKEN" \
+            -H 'Accept: application/vnd.github+json' -H 'Content-Type: application/json' \
+            "$GITHUB_API_URL/repos/$DEPLOY_TARGET/dispatches" --data-binary "$payload"
