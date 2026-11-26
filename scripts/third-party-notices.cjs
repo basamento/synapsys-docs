@@ -3,9 +3,12 @@ const path = require('node:path');
 
 // Collect licenses of packages present in the client compilation. Include all
 // LICENSE/NOTICE files found, even when a module is later optimized away.
-module.exports = function thirdPartyNotices() {
+module.exports = function thirdPartyNotices({ siteDir }) {
   return {
     name: 'third-party-notices',
+    postBuild({ outDir }) {
+      fs.copyFileSync(path.join(siteDir, 'LICENSE'), path.join(outDir, 'license.txt'));
+    },
     configureWebpack(_config, isServer) {
       if (isServer) return {};
       return { plugins: [{

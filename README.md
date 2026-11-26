@@ -23,11 +23,11 @@ Requires Node 20 or later.
 ## Publishing the site
 
 Run `npm run build` to generate a static site in `build/`. The generated files
-can be served by a static web server. The build also generates
-`build/third-party-notices.txt` from the client compilation. If a dependency
-does not include a license file, the build fails until its license text and
-provenance have been checked and the collector updated. The Infima fallback
-uses the license in its upstream release tag.
+can be served by a static web server. The build copies the site's Apache license
+to `build/license.txt` and generates `build/third-party-notices.txt` from the
+client compilation. If a dependency does not include a license file, the build
+fails until its license text and provenance have been checked and the collector
+updated. The Infima fallback uses the license in its upstream release tag.
 
 ## Layout
 

@@ -1,7 +1,11 @@
 import type { ReactNode } from 'react';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 import Layout from '@theme/Layout';
 
 export default function Legal(): ReactNode {
+  const licenseUrl = useBaseUrl('/license.txt');
+  const noticesUrl = useBaseUrl('/third-party-notices.txt');
+
   return (
     <Layout title="Legal and licensing" description="Ownership and licensing information for Synapsys.">
       <main className="container margin-vert--lg">
@@ -22,8 +26,8 @@ export default function Legal(): ReactNode {
           <h2>Documentation</h2>
           <p>
             Original Synapsys documentation content and website source are available under
-            the Apache License 2.0. Third-party components retain their own licenses; see the
-            {' '}<a href="/third-party-notices.txt">third-party notices</a> included in this site.
+            the <a href={licenseUrl}>Apache License 2.0</a>. Third-party components retain
+            their own licenses. See the <a href={noticesUrl}>third-party notices</a>.
           </p>
 
           <h2>SDKs and starters</h2>
